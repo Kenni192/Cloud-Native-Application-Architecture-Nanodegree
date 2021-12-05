@@ -1,0 +1,15 @@
+INFO:werkzeug: * Running on http://0.0.0.0:3111/ (Press CTRL+C to quit)
+INFO:werkzeug:127.0.0.1 - - [22/Sep/2021 12:42:07] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Sep/2021 12:42:07] "GET /static/css/main.css HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Sep/2021 12:42:07] "GET /favicon.ico HTTP/1.1" 404 -
+INFO:app:22-09-2021, 12:42:33, Article "2020 CNCF Annual Report" retrieved
+INFO:werkzeug:127.0.0.1 - - [22/Sep/2021 12:42:33] "GET /1 HTTP/1.1" 200 -
+INFO:app:22-09-2021, 12:43:12, The "About Us" page is retrieved.
+INFO:werkzeug:127.0.0.1 - - [22/Sep/2021 12:43:12] "GET /about HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Sep/2021 12:43:36] "GET /create HTTP/1.1" 200 -
+INFO:app:22-09-2021, 12:44:06, A new article "Test" is created!
+INFO:werkzeug:127.0.0.1 - - [22/Sep/2021 12:44:06] "POST /create HTTP/1.1" 302 -
+INFO:werkzeug:127.0.0.1 - - [22/Sep/2021 12:44:06] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [22/Sep/2021 12:44:50] "GET /new HTTP/1.1" 404 -
+ERROR:app:22-09-2021, 12:45:06, A non-existing article is accessed and a 404 page is returned.
+INFO:werkzeug:127.0.0.1 - - [22/Sep/2021 12:45:06] "GET /404 HTTP/1.1" 404 -
