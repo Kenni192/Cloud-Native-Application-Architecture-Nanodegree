@@ -72,3 +72,77 @@ To run this application follow these steps:
 4. Docker
 5. Vagrant 
 6. VirtualBox 6.1.16 or higher
+
+# Step 1:
+
+## Best Practices For Application Deployment
+Throughout this step, we should apply some of the learned best development practices to the TechTrends project. As a result, we will implement the metrics and health check endpoints, in addition to the logging functionality.
+
+### Healthcheck endpoint
+Build the /healthz endpoint for the TechTrends application.The endpoint should return the following response:
+ - An HTTP 200 status code
+ - A JSON response containing the result: OK - healthy message
+
+### Logs
+Extend the TechTrends application to log the events
+
+### Screenshot
+
+![Step_1](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/TechTrends/screenshots/Step_1/Step_1.png)
+
+Every log line should include the timestamp and be outputted to the STDOUT and STDERR. Also, capture any Python logs at the DEBUG level.
+
+# Step 2: 
+
+## Docker for Application Packaging
+This step focuses on packaging the application using Docker. We will write a Dockerfile and build a Docker image for the TechTrends project. By the end of this step, we should have the application running locally inside a Docker container.
+
+## Dockerfile
+Build a Dockerfile with instructions to package the TechTrends application. The Dockerfile should contain the following steps:
+- Use a Python base image in version 2.7
+- Expose the application port 3111
+- Install packages defined in the requirements.txt file
+- Ensure that the database is initialized with the pre-defined posts in the init_db.py file
+- The application should execute at the container start
+
+The completed Docker file can be found [here](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/TechTrends/techtrends/Dockerfile)
+
+## Docker Image
+Using the Dockerfile defined above, create a Docker image and test it locally. The Docker build command should:
+- Reference the defined Dockerfile
+- Tag the image as techtrends
+- Make sure you specify the location of the Dockerfile
+
+## Run and test locally
+Test the Docker image locally, with the following specifications:
+- Using the detached mode
+- Expose the application port on port 7111 on the machine
+
+Access the application in the browser using the http://127.0.0.1:7111 endpoint and try to click on some of the available posts, create a new post, access the metrics endpoint, etc.Once this stage is complete and we can confirm that the application is up and running, use the Docker commands to retrieve the logs from the application.
+
+![docker_run_local](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/TechTrends/screenshots/Step_2/docker_run_local.png)
+
+# Step 3:
+
+## Continuous Integration with GitHub Actions
+This step aims to use the Continuous Integration (CI) fundamentals and automate the packaging of the TechTrends application. We will use GitHub Actions to build, tag, and push the TechTrends Docker image to DockerHub. As a result, we should have a functional GitHub Action that will construct a new image with every new commit to the main branch.
+
+## GitHub Actions
+Created a GitHub Action that will package and push the new image for the TechTrends application to DockerHub. The configuration file with the name techtrends-dockerhub.yml is placed in the .github/workflows/ directory. If the directory does not exist, create it using the mkdir -p .github/workflows/ command.
+
+These functionalities should be implemented using the Build and Push Docker images upstream GitHub Action at the basis. The following action uses DockerHub Tokens and encrypted GitHub secrets to login into DockerHub and to push new images. To set up these credentials refer to the following resources:
+- Create [DockerHub Tokens](https://www.docker.com/blog/docker-hub-new-personal-access-tokens/)
+- Create [GitHub encrypted secrets](https://docs.github.com/en/free-pro-team@latest/actions/reference/encrypted-secrets)
+
+Constructed a GitHub Action, that would package and push the TechTrends application with the following requirements:
+- name - "TechTrends - Package with Docker"
+- Trigger on every push to the main branch
+- Run the action on the ubuntu-latest operating system
+- For the Docker build and push step:
+    - Context should be set to the project directory
+    - Reference the Dockerfile for TechTrends application
+    - Push the image to DockerHub with the tag techtrends:latest
+
+After creating the GitHub Action verify it executes successfully when a new commit is pushed to the master branch. Verified DockerHub account for the TechTrends image with the tag latest being pushed successfully.
+
+![ci-github-actions](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/TechTrends/screenshots/Step_3/ci-github-actions.JPG)
