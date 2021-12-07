@@ -317,3 +317,7 @@ Using kubectl commands apply the ArgoCD Applications manifests. Make sure to syn
 ![argocd-techtrends-staging](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/TechTrends/screenshots/Step_5/argocd-techtrends-staging.PNG)
 
 ![argocd-techtrends-prod](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/TechTrends/screenshots/Step_5/argocd-techtrends-prod.PNG)
+
+# Mentor Review from Udacity
+
+![Mentor_Review_TechTrends](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/TechTrends/images/Mentor_Review_TechTrends.PNG)
