@@ -204,7 +204,8 @@ Using the declarative approach, deploy the TechTrends application to the Kuberne
   - protocol: TCP
   - type: ClusterIP
 
-### NOTE: namespace.yaml, deploy.yaml and service.yaml in the [kubernetes](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/tree/main/TechTrends/kubernetes) folder.
+### NOTE: 
+namespace.yaml, deploy.yaml and service.yaml in the [kubernetes](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/tree/main/TechTrends/kubernetes) folder.
 
 ## Deploy TechTrends with Kubernetes manifests
 Using the Kubernetes manifests and kubectl commands, deploy the TechTrends application to the k3s cluster. As a result, we should have the following resource created:
