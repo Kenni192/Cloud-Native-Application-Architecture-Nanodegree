@@ -146,3 +146,74 @@ Constructed a GitHub Action, that would package and push the TechTrends applicat
 After creating the GitHub Action verify it executes successfully when a new commit is pushed to the master branch. Verified DockerHub account for the TechTrends image with the tag latest being pushed successfully.
 
 ![ci-github-actions](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/TechTrends/screenshots/Step_3/ci-github-actions.JPG)
+
+# Step 4:
+
+## Kubernetes Declarative Manifests
+In this step, we deployed a Kubernetes cluster using k3s and deploy the TechTrends application. We created declarative Kubernetes manifests and release the application to the sandbox environment. By the end of this step, we should have a collection of YAML manifests that will manage the TechTrends application within the cluster.
+
+## Deploy a Kubernetes cluster
+Using vagrant, create a Kubernetes cluster with k3s. Refer to the [Vagrantfile](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/TechTrends/Vagrantfile) from the course repository. Make sure to have vagrant and VirtualBox 6.1.16 or higher installed.
+
+To create a vagrant box and ssh into it, use the following commands:
+```
+# create a vagrant box using the Vagrantfile in the current directory
+vagrant up
+
+# SSH into the vagrant box
+# Note: this command uses the .vagrant folder to identify the details of the vagrant box
+vagrant ssh
+```
+To deploy the Kubernetes cluster, refer to the [k3s](https://k3s.io/) documentation or use the following command
+```
+curl -sfL https://get.k3s.io | sh -
+```
+To interact with the cluster kubectl, you need to have root access to the kubeconfig file. Hence, use sudo su - to become root and use kubectl commands.
+Verify if the cluster is operational by evaluating if the node in the cluster is up and running. We can use the below command.
+```
+kubectl get no
+```
+
+![k8s-nodes](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/TechTrends/screenshots/Step_4/k8s-nodes.JPG)
+
+## Kubernetes Declarative Manifests
+Using the declarative approach, deploy the TechTrends application to the Kubernetes cluster. Construct the YAML manifests for the following resources:
+
+- Namespace in namespace.yaml file:
+   - name: sandbox
+- Deployment in deploy.yaml file:
+  - namespace: sandbox
+  - image: techtrends:latest
+  - name:techtrends
+  - replicas: 1
+  - resources:
+    - requests: CPU 250m and memory 64Mi
+    - limits: CPU 500m and memory 128Mi
+- container port: 3111
+- liveness probe:
+  - path: /healthz
+  - port: 3111
+- readiness probe:
+  - path: /healthz
+  - port: 3111
+- Service in service.yaml file:
+  - namespace: sandbox
+  - name: techtrends
+  - port: 4111
+  - target port: 3111
+  - protocol: TCP
+  - type: ClusterIP
+
+### NOTE: namespace.yaml, deploy.yaml and service.yaml in the [kubernetes](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/tree/main/TechTrends/kubernetes) folder.
+
+## Deploy TechTrends with Kubernetes manifests
+Using the Kubernetes manifests and kubectl commands, deploy the TechTrends application to the k3s cluster. As a result, we should have the following resource created:
+
+- a sandbox namespace
+- a techtrends deployment, in the sandbox namespace with 1 replica or pod running
+- a techtrends service that exposes the TechTrends application on port 4111 using a ClusterIP
+
+To list down all the pods, services in a namespace use the following command,
+```
+kubectl get all -n sandbox
+```
