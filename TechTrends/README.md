@@ -281,3 +281,39 @@ values-prod.yaml file:
 
 ### Note: 
 Helm chart files are placed in the [helm](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/tree/main/TechTrends/helm) folder.
+
+# Step 6:
+
+## Continuous Delivery with ArgoCD
+In this final step, we deployed the TechTrends automatically using Continuous Delivery fundamentals. We made use of ArgoCD to release the application to staging and production environments using the templated manifests from the Helm chart. By the end of this step, we should have an automated and templated procedure to deploy TechtTends to multiple environments.
+
+## Deploy ArgoCD
+Given the k3s cluster, install ArgoCD and access it through the browser. Make sure to reference the instructions below:
+
+- Official [install guide for ArgoCD](https://argoproj.github.io/argo-cd/getting_started/#1-install-argo-cd)
+- The YAML manifest for the NodePort service can be found under the [argocd-server-nodeport.yaml](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/TechTrends/argocd/argocd-server-nodeport.yaml) file in the course repository
+- Access the ArgoCD UI by going to https://192.168.50.4:30008 or http://192.168.50.4:30007
+- Login credentials can be retrieved using the steps in the [credentials guide](https://argoproj.github.io/argo-cd/getting_started/#4-login-using-the-cli)
+
+![argocd_ui](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/TechTrends/screenshots/Step_5/argocd_ui.PNG)
+
+## ArgoCD Applications
+Create ArgoCD Applications resources to deploy TechTrends to staging and production environments. We need to reference the TechTrends Helm chart built in the previous step and use the respective input files. As such, create the following ArgoCD application manifests:
+
+helm-techtrends-staging.yaml:
+ - name: techtrends-staging
+ - values file: values-staging.yaml
+
+helm-techtrends-prod.yaml:
+ - name: techtrends-prod
+- values file: values-prod.yaml
+
+### Note: 
+ArgoCD manifests is placed in the [argo folder](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/tree/main/TechTrends/argocd)
+
+## Deploy TechTrends with ArgoCD
+Using kubectl commands apply the ArgoCD Applications manifests. Make sure to synchronize the application in ArgoCD, so that all the TechTrends resources is deployed successfully. As a result, we should have 2 new namespaces, staging and prod, a deployment for each environment (each with a different amount of pods), and a service exposing the application on different ports.
+
+![argocd-techtrends-staging](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/TechTrends/screenshots/Step_5/argocd-techtrends-staging.PNG)
+
+![argocd-techtrends-prod](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/TechTrends/screenshots/Step_5/argocd-techtrends-prod.PNG)
