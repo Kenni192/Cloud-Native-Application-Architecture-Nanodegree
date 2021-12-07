@@ -217,3 +217,66 @@ To list down all the pods, services in a namespace use the following command,
 ```
 kubectl get all -n sandbox
 ```
+
+# Step 5:
+
+## Helm Charts
+Throughout this step, we used a template configuration manager, such as Helm, to parameterized the TechTrends manifests. We build a Helm Chart to template and release the application to multiple environments. As a result, we should have a collection of parametrized YAML manifests that used an input values file to generate valid Kubernetes objects.
+
+## Helm Chart
+Using the YAML manifests build in the previous step, create a Helm chart with the following specifications:
+
+Chart.yaml file:
+- apiVersion: v1
+- name: techtrends
+- keywords: techtrends
+- version: 1.0.0
+- list yourself as a maintainer
+
+[templates/](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/tree/main/TechTrends/helm/templates) folder has the following parameterized files:
+
+- deploy.yaml
+- namespace.yaml
+- service. yaml
+
+values.yaml file should provide input for the following parameters (Note: these input values act as defaults for the Helm chart):
+- namespace name: sandbox
+- service:
+  - port: 4111
+  - targetPort: 3111
+  - protocol: TCP
+  - type: ClusterIP
+- image:
+  - repository: techtrends
+  - tag: latest
+  - pullPolicy: IfNotPresent
+- replicaCount: 1
+- resources:
+  - requests: memory 64Mi and CPU 250m
+  - limits: memory 128Mi and CPU 500m
+- containerPort: 3111
+- livenessProbe path: /healthz check on containerPort
+- readinessProbe path: /healthz check on containerPort
+
+## Values.yaml files for multiple environments
+Once we have constructed the Helm chart with a default "values.yaml" file, create 2 more input files with the following specifications:
+
+values-staging.yaml file:
+- namespace name: staging
+- service port: 5111
+- replicaCount: 3
+- resources:
+  - requests: memory 90Mi and CPU 300m
+  - limits: memory 128Mi and CPU 500m
+
+values-prod.yaml file:
+- namespace name: prod
+- service port: 7111
+- image pullPolicy: Always
+- replicaCount: 5
+- resources:
+  - requests: memory 128Mi and CPU 350m
+  - limits: memory 256Mi and CPU 500m
+
+### Note: 
+Helm chart files are placed in the [helm](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/tree/main/TechTrends/helm) folder.
