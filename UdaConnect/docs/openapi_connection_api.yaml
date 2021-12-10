@@ -1,0 +1,70 @@
+openapi: 3.0.0
+info:
+  description: API for adding and retrieving Connections on UdaConnect Platform
+  version: "1.0.0"
+  title: UdaConnect Connection API
+paths:
+  '/api/persons/{person_id}/connection{start_date}&{end_date}&{distance}':
+    parameters:
+      - in: path
+        description: Unique ID for a given Person
+        name: person_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/QuerryConnection'
+      - in: path
+        description: Start Date for querry
+        name: start_date
+        required: true
+        schema:
+          $ref: '#/components/schemas/QuerryConnection'
+      - in: path
+        description: End Date for querry
+        name: end_date
+        required: true
+        schema:
+          $ref: '#/components/schemas/QuerryConnection'
+      - in: path
+        description: The distance between locations and connections
+        name: distance
+        required: true
+        schema:
+          $ref: '#/components/schemas/QuerryConnection'
+    get:
+      summary: Retrieves a Connection on UdaConnect
+      operationId: getConnectionResource
+      description: Retrieves a Connection in UdaConnect
+      responses:
+        '200':
+          description: Get a specific Connections per Person
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/QuerryConnection'
+        '400':
+          description: Bad input parameter
+components:
+  schemas:
+    QuerryConnection:
+      type: string
+      example: 'Example: /api/persons/5/connection?start_date=2021-10-24&end_date=2021-12-30&distance=5'
+      required:
+        - person_id
+        - start_date
+        - end_date
+        - distance
+      properties:
+        person_id:
+          type: string
+          example: '5'
+        start_date:
+          type: string
+          example: '2021-10-24'
+        end_date:
+          type: string
+          example: '2021-12-30'
+        distance:
+          type: string
+          example: '5'

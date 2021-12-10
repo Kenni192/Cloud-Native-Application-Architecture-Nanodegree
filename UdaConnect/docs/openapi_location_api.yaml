@@ -1,0 +1,80 @@
+openapi: 3.0.0
+info:
+  description: API for adding and retrieving Locations on UdaConnect Platform
+  version: "1.0.0"
+  title: UdaConnect Location API
+paths:
+  /api/locations:
+    post:
+      summary: Adds a Location to UdaConnect
+      operationId: addLocationnResourcesy
+      description: Enables to Add a location to UdaConnect.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddLocation'
+        description: Location resource that was added
+      responses:
+        '201':
+          description: Location added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddLocation'
+        '400':
+          description: 'Invalid input, object invalid'
+  '/api/locations/{location_id}':
+    parameters:
+      - in: path
+        description: Unique ID for a given Location
+        name: location_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/QuerryLocation'
+    get:
+      summary: Retrieves a locations on UdaConnect
+      operationId: getLocationResource
+      description: Retrieves a location in UdaConnect.
+      responses:
+        '200':
+          description: Get a specific Location
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/QuerryLocation'
+        '400':
+          description: Bad input parameter
+components:
+  schemas:
+    AddLocation:
+      type: object
+      required:
+        - person_id
+        - creation_time
+        - latitude
+        - longitude
+      properties:
+        person_id:
+          type: string
+          example: '5'
+        creation_time:
+          type: string
+          example: '2021-10-24T11:32:07'
+        latitude:
+          type: string
+          example: '-112.292383'
+        longitude:
+          type: string
+          example: '27.54433'
+    QuerryLocation:
+      type: string
+      example: 'Example: /api/location/45'
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+          example: '45'

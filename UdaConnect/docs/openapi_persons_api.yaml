@@ -1,0 +1,115 @@
+openapi: 3.0.0
+info:
+  description: API for adding and retrieving Persons on UdaConnect Platform
+  version: "1.0.0"
+  title: UdaConnect Persons API
+paths:
+  /api/persons:
+    get:
+      summary: Retrieves all persons on UdaConnect
+      operationId: getPersonResources
+      description: Retrieves all the members of UdaConnect.
+      responses:
+        '200':
+          description: All Persons
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/QuerryPersons'
+        '400':
+          description: Bad input parameter
+    post:
+      summary: Adds a Person to UdaConnect
+      operationId: addPersonResourcesy
+      description: Enables to Add a person to UdaConnect.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddPerson'
+        description: Person resource that was added
+      responses:
+        '201':
+          description: Person added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddPerson'
+        '400':
+          description: 'Invalid input, object invalid'
+  '/api/persons/{person_id}':
+    parameters:
+      - in: path
+        description: Unique ID for a given Person
+        name: person_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/QuerryPerson'
+    get:
+      summary: Retrieves a persons on UdaConnect
+      operationId: getPersonResource
+      description: Retrieves a members of UdaConnect.
+      responses:
+        '200':
+          description: Get a specific Person
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/QuerryPersons'
+        '400':
+          description: Bad input parameter
+components:
+  schemas:
+    QuerryPersons:
+      type: object
+      required:
+        - id
+        - first_name
+        - last_name
+        - company_name
+      properties:
+        id:
+          type: string
+          example: '5'
+        first_name:
+          type: string
+          example: 'Harini'
+        last_name:
+          type: string
+          example: 'Pavithra'
+        company_name:
+          type: string
+          example: 'ABC Private Limited'
+    AddPerson:
+      type: object
+      required:
+        - id
+        - first_name
+        - last_name
+        - company_name
+      properties:
+        id:
+          type: string
+          example: '11'
+        first_name:
+          type: string
+          example: 'Maria'
+        last_name:
+          type: string
+          example: 'George'
+        company_name:
+          type: string
+          example: 'Google'
+    QuerryPerson:
+      type: string
+      example: 'Example: /api/persons/5'
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          example: '5'
