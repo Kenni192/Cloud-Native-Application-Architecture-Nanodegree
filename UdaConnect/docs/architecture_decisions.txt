@@ -1,0 +1,37 @@
+The Monolith is split in THREE microservices:
+
+- The Person API/Service
+- The Location API/Service
+- The Connection API/Service
+
+Using REST:
+- The Person and Location services use the HTTP rest calls to retrieve data from the Database
+- Also, the Connection service uses the HTTP rest calls to retrieve data from the Database
+
+
+Using KAFKA:
+- Kafka Broker is deployed using helm and bitnami helm chart. It deployes two pods, one for the borker and one for the zookeeper.
+- There are Producers in both of the services {Person Service and Location Service} that push the requests to the Kafka Broker.
+- The Kafka Consumer which is deployed on a Pod, is connected to the Kafka Broker, all the messages that are produced in the
+"test" topic from the Producers inside the Services, the Kafka Consumer, takes them and pushes them into the gRPC as PROTOBUFs
+
+Kafka is good for Asynchronous messaging communication between the microservices and if deployed as a HA,
+it can handle huge load of data.
+
+
+Using gRCP:
+- The gRCP server is deployed as POD, and recieves data as PROTOBUFs from Kafka Consumer in real time and it persists them into Postgres DB.
+- gRCP is a lightweight communication protocol, and its good to enforce certain request/data formats through the PROTOBUF messages.
+- Because of its lightweight architecture it is recommended over REST when in need of speed and more messaging enforcement structure.
+
+
+With this design the load of the services is distributed accross the components of architecture,
+and we can achieve more security in terms of persisiting data to the DB as we can enforce more secure formats through gRCP.
+Also in case of high load of traffic INTO the system, our kafka deployment helps us to better handle that load, we can make it more high availability architecture.
+So this helps us scale easier in terms of User increase.
+
+In this case we now don't have all the requests coming to one Instance as that of Monolith, which could hace caused high load,
+now we have a split of request in the three microservices, and both the location and person service have just to push the data to the kafka
+boker and now need to persist that, kafka consumers take care of that. So the separation of concern and load processing is not one one service now.
+For more, we can increase here in regards to handling large volume of data, is we can increase the number of workers for each service,
+numbers of workers for kafka consumers, and have a cluster of kafka broker setup.
