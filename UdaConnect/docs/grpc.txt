@@ -1,0 +1,5 @@
+In the Project folder "modules" we have the grpc folder, and there is a "writer.py" that we can run once we have the gRPC server running.
+
+Once we run the writer, we can refresh the website and a Person should show there.
+
+This is for testing, the Kafka Consumer does the gRPC calls in the project.
