@@ -130,12 +130,14 @@ These pages should also load on your web browser:
 
 The Architecture diagram can be found [here](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/UdaConnect/docs/architecture_design.PNG)
 
+![architecture_design](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/UdaConnect/docs/architecture_design.PNG)
+
 ## Step 3:
 ### Justify our Decisions
 - Write a 2-3 sentence rationale for each message passing strategy to justify our decision. 
 
-The Architecture decision can be found [here](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/UdaConnect/docs/architecture_decisions.txt)
-The gRPC doc can be found [here](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/UdaConnect/docs/grpc.txt)
+The Architecture decision can be found [here](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/UdaConnect/docs/architecture_decisions.txt) and 
+the gRPC doc can be found [here](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/UdaConnect/docs/grpc.txt)
 
 ## Step 4:
 ### Refactor into Microservices
@@ -143,7 +145,7 @@ The gRPC doc can be found [here](https://github.com/Harini-Pavithra/Cloud-Native
 - While microservices can be technology-agnostic, we want to make sure that we use tools that our company is comfortable with. Therefore, this project should be done in Python.
 
 ### 4.1: New Services
-New services can be created inside of the `modules/` subfolder. We can choose to write something new with Flask, copy and rework the `modules/api` service into something new, or just create a very simple Python application.
+- New services can be created inside of the `modules/` subfolder. We can choose to write something new with Flask, copy and rework the `modules/api` service into something new, or just create a very simple Python application.
 
 As a reminder, each module should have:
 1. `Dockerfile`
@@ -152,10 +154,11 @@ As a reminder, each module should have:
 4. `__init__.py`
 
 ### 4.2: Docker Images
-`udaconnect-app` and `udaconnect-api` use docker images from `isjustintime/udaconnect-app` and `isjustintime/udaconnect-api`. To make changes to the application, we need to build our own Docker image and push it to our own DockerHub repository. Replace the existing container registry path with our own.
+- `udaconnect-app` and `udaconnect-api` use docker images from `isjustintime/udaconnect-app` and `isjustintime/udaconnect-api`. 
+- To make changes to the application, we need to build our own Docker image and push it to our own DockerHub repository. Replace the existing container registry path with our own.
 
 ### 4.3: Configs and Secrets
-In `deployment/db-secret.yaml`, the secret variable is `d293aW1zb3NlY3VyZQ==`. The value is simply encoded and not encrypted -- this is ***not*** secure! Anyone can decode it to see what it is.
+- In `deployment/db-secret.yaml`, the secret variable is `d293aW1zb3NlY3VyZQ==`. The value is simply encoded and not encrypted -- this is ***not*** secure! Anyone can decode it to see what it is.
 ```bash
 # Decodes the value into plaintext
 echo "d293aW1zb3NlY3VyZQ==" | base64 -d
@@ -166,12 +169,12 @@ echo "hotdogsfordinner" | base64
 This is okay for development against an exclusively local environment and we want to keep the setup simple so that you can focus on the project tasks. However, in practice we should not commit our code with secret values into our repository. A CI/CD pipeline can help prevent that.
 
 ### 4.4: PostgreSQL Database
-The database uses a plug-in named PostGIS that supports geographic queries. It introduces `GEOMETRY` types and functions that we leverage to calculate distance between `ST_POINT`'s which represent latitude and longitude.
+- The database uses a plug-in named PostGIS that supports geographic queries. It introduces `GEOMETRY` types and functions that we leverage to calculate distance between `ST_POINT`'s which represent latitude and longitude.
 
 _We may find it helpful to be able to connect to the database_. In general, most of the database complexity is abstracted from us. The Docker container in the starter should be configured with PostGIS. Seed scripts are provided to set up the database table and some rows.
 
 ### 4.5: Database Connection
-While the Kubernetes service for `postgres` is running (we can use `kubectl get services` to check), you can expose the service to connect locally:
+- While the Kubernetes service for `postgres` is running (we can use `kubectl get services` to check), you can expose the service to connect locally:
 ```bash
 kubectl port-forward svc/postgres 5432:5432
 ```
