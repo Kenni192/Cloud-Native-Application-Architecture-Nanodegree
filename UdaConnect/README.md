@@ -114,3 +114,164 @@ These pages should also load on your web browser:
 * `http://localhost:30001/` - OpenAPI Documentation
 * `http://localhost:30001/api/` - Base path for API
 * `http://localhost:30000/` - Frontend ReactJS Application
+
+# Project Steps
+
+## Step 1:
+### Review and Plan
+- Review the [project](https://github.com/udacity/nd064-c2-message-passing-projects-starter)
+- Determine which message passing strategies would integrate well when refactoring to a microservice architecture.
+
+## Step 2:
+### Design and Document
+- Using the design decisions from the Step 1, create an architecture diagram of our microservice architecture showing the services and message passing techniques between them.
+- Continue to use Kubernetes and maintain the core functionality of the starter project.
+- We have to include at least three message passing strategies into our microservice architecture implementing Kafka, gRPC, and either enhancing or creating a RESTful API endpoint.
+
+The Architecture diagram can be found [here](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/UdaConnect/docs/architecture_design.PNG)
+
+## Step 3:
+### Justify our Decisions
+- Write a 2-3 sentence rationale for each message passing strategy to justify our decision. 
+
+The Architecture decision can be found [here](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/UdaConnect/docs/architecture_decisions.txt)
+The gRPC doc can be found [here](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/UdaConnect/docs/grpc.txt)
+
+## Step 4:
+### Refactor into Microservices
+- Refactor the starter code into a microservice architecture.
+- While microservices can be technology-agnostic, we want to make sure that we use tools that our company is comfortable with. Therefore, this project should be done in Python.
+
+### 4.1: New Services
+New services can be created inside of the `modules/` subfolder. We can choose to write something new with Flask, copy and rework the `modules/api` service into something new, or just create a very simple Python application.
+
+As a reminder, each module should have:
+1. `Dockerfile`
+2. Its own corresponding DockerHub repository
+3. `requirements.txt` for `pip` packages
+4. `__init__.py`
+
+### 4.2: Docker Images
+`udaconnect-app` and `udaconnect-api` use docker images from `isjustintime/udaconnect-app` and `isjustintime/udaconnect-api`. To make changes to the application, we need to build our own Docker image and push it to our own DockerHub repository. Replace the existing container registry path with our own.
+
+### 4.3: Configs and Secrets
+In `deployment/db-secret.yaml`, the secret variable is `d293aW1zb3NlY3VyZQ==`. The value is simply encoded and not encrypted -- this is ***not*** secure! Anyone can decode it to see what it is.
+```bash
+# Decodes the value into plaintext
+echo "d293aW1zb3NlY3VyZQ==" | base64 -d
+
+# Encodes the value to base64 encoding. K8s expects your secrets passed in with base64
+echo "hotdogsfordinner" | base64
+```
+This is okay for development against an exclusively local environment and we want to keep the setup simple so that you can focus on the project tasks. However, in practice we should not commit our code with secret values into our repository. A CI/CD pipeline can help prevent that.
+
+### 4.4: PostgreSQL Database
+The database uses a plug-in named PostGIS that supports geographic queries. It introduces `GEOMETRY` types and functions that we leverage to calculate distance between `ST_POINT`'s which represent latitude and longitude.
+
+_We may find it helpful to be able to connect to the database_. In general, most of the database complexity is abstracted from us. The Docker container in the starter should be configured with PostGIS. Seed scripts are provided to set up the database table and some rows.
+
+### 4.5: Database Connection
+While the Kubernetes service for `postgres` is running (we can use `kubectl get services` to check), you can expose the service to connect locally:
+```bash
+kubectl port-forward svc/postgres 5432:5432
+```
+This will enable us to connect to the database at `localhost`. we should then be able to connect to `postgresql://localhost:5432/geoconnections`. This is assuming we use the built-in values in the deployment config map.
+
+### 4.6: Software
+To manually connect to the database, we will need software compatible with PostgreSQL.
+* CLI users will find [psql](http://postgresguide.com/utilities/psql.html) to be the industry standard.
+* GUI users will find [pgAdmin](https://www.pgadmin.org/) to be a popular open-source solution.
+
+The microservices for Conenction,Person and Location can be found [here](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/tree/main/UdaConnect/modules)
+
+# Step 5:
+### Implement Message Passing Technique 
+- Implementing gRPC with Python involves two libraries:
+    - grpcio to run client and server code
+    - grpcio-tools to generate definition code.
+ 
+![gRPC](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/UdaConnect/Images/gRPC.PNG)
+
+### 5.1: Creating a gRPC Client and Server
+- Define a protobuf request messages, response messages, and service in a .proto file.
+- Use grpcio-tools command on the .proto file to generate a pair of Python files representing the messages and the services.
+- Import the pair of Python files into our application logic and implement our client/server.
+
+The Protobuf file can be found [here](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/UdaConnect/modules/grpc/orders.proto)
+
+Remember: orders.proto is used only to generate the Python files.
+
+###  5.2: Generate gRPC Files
+Using grpcio-tools, generate a pair of files that can be directly imported into ur Python code:
+```
+grpc_tools.protoc -I./ --python_out=./ --grpc_python_out=./ orders.proto
+```
+The path ./, can be replaced with another path or an absolute path to our .proto file.
+
+The files orders_pb2.py and orders_pb2_grpc.py should have been generated.
+
+The generated files can be found [here](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/tree/main/UdaConnect/modules/grpc)
+
+### 5.3: Import gRPC Files
+Import the files to your application to use class definitions.
+```
+import orders_pb2
+import orders_pb2_grpc
+```
+Creating a message with data would look like the following:
+```
+item = orders_pb2.ItemMessage(
+               name="xxx",
+               brand_name="yyy",
+               id=34,
+               weight=1.2
+           )
+```
+
+### Tips
+1. Install `grpc-io` with `pip install grpcio-tools`
+2. Verify installation with `pip list`
+3. Run the `grpc-io` command in the same directory as orders.proto. 
+4. orders_pb2.py and orders_pb2_grpc.py should have been created
+5. Install grpcio with `pip install grpcio`. This may have already been installed when grpcio-tools was installed
+6. orders_pb2_grpc.py and orders_pb2.py should not be edited. The files even have lines that explicitly state DO NOT EDIT!.
+
+### 5.4: gRPC Server
+- gRPC server logic is implemented in `main.py`
+- grpc is imported to use gRPC in Python code
+- orders_pb2 and orders_pb2_grpc is imported to handle the ItemMessage and ItemService that was defined in the .proto file
+- ItemServicer is the implementation of the ItemService protobuf stub
+- Create in ItemServicer defines our custom logic. It is set up in a simple manner where a Python dictionary is printed and returned as an orders_pb2.ItemMessage object instead of an unstructured dict
+- The file handles a lot of boilerplate for setting up a gRPC server since we aren't using a framework like Flask that can reduce boilerplate
+
+The main.py file can be found [here](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/UdaConnect/modules/grpc/main.py)
+
+### 5.5: Running the gRPC Server
+```
+python main.py 
+```
+will serve the gRPC server on localhost:5005 import gprc to use gRPC
+
+### 5.6: Create gRPC Client
+- gRPC client logic is implemented in `writer.py`
+- grpc is imported to use gRPC in Python code
+- orders_pb2 and orders_pb2_grpc is imported to handle the ItemMessage and ItemService that was defined in the .proto file. These files don't need to be regenerated.
+- Client is configured to send messages to localhost:5005 where the gRPC server is running.
+- orders_pb2.ItemMessage object is created with expected fields and values.
+
+The writer.py can be found [here](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/UdaConnect/modules/grpc/writer.py)
+
+### 5.7: Running the gRPC Client
+```
+python writer.py 
+```
+- The above command will run the gRPC client
+- Changing tabs to where the gRPC server is running, it prints the payload that was passed by the gRPC client.
+
+Note: 
+As a reminder, each module should have:
+1. `Dockerfile`
+2. Its own corresponding DockerHub repository
+3. `requirements.txt` for `pip` packages
+
+
