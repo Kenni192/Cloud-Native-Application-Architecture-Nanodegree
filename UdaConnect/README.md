@@ -117,13 +117,11 @@ These pages should also load on your web browser:
 
 # Project Steps
 
-## Step 1:
-### Review and Plan
+## Step 1: Review and Plan
 - Review the [project](https://github.com/udacity/nd064-c2-message-passing-projects-starter)
 - Determine which message passing strategies would integrate well when refactoring to a microservice architecture.
 
-## Step 2:
-### Design and Document
+## Step 2: Design and Document
 - Using the design decisions from the Step 1, create an architecture diagram of our microservice architecture showing the services and message passing techniques between them.
 - Continue to use Kubernetes and maintain the core functionality of the starter project.
 - We have to include at least three message passing strategies into our microservice architecture implementing Kafka, gRPC, and either enhancing or creating a RESTful API endpoint.
@@ -132,15 +130,13 @@ The Architecture diagram can be found [here](https://github.com/Harini-Pavithra/
 
 ![architecture_design](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/UdaConnect/docs/architecture_design.PNG)
 
-## Step 3:
-### Justify our Decisions
+## Step 3: Justify our Decisions
 - Write a 2-3 sentence rationale for each message passing strategy to justify our decision. 
 
 The Architecture decision can be found [here](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/UdaConnect/docs/architecture_decisions.txt) and 
 the gRPC doc can be found [here](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/UdaConnect/docs/grpc.txt)
 
-## Step 4:
-### Refactor into Microservices
+## Step 4: Refactor into Microservices
 - Refactor the starter code into a microservice architecture.
 - While microservices can be technology-agnostic, we want to make sure that we use tools that our company is comfortable with. Therefore, this project should be done in Python.
 
@@ -187,8 +183,7 @@ To manually connect to the database, we will need software compatible with Postg
 
 The microservices for Conenction,Person and Location can be found [here](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/tree/main/UdaConnect/modules)
 
-# Step 5:
-### Implement Message Passing Technique 
+# Step 5: Implement Message Passing Technique 
 - Implementing gRPC with Python involves two libraries:
     - grpcio to run client and server code
     - grpcio-tools to generate definition code.
