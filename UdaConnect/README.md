@@ -273,18 +273,151 @@ As a reminder, each module should have:
 3. `requirements.txt` for `pip` packages
 
 # Step 6: Implement Kafka Broker
-### Kafka Use Cases
+### 6.1: Kafka Use Cases
 - Kafka is a special type of message queue that is often used to handle large volumes of data generated continuously as events.
 - Some examples include application logs and user activity — things that represent that "something has happened."
 
-### Architecture Overview
+### 6.1.1: Architecture Overview
 - Kafka is a distributed system, which means that it is an application that is powered by multiple nodes.
 - When a producer writes data to Kafka, it stores the data inside of topics.
 
 ![Kafka](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/UdaConnect/Images/Kafka.PNG)
 
-### Topics
+### 6.1.2: Topics
 - Topics are abstractions of Kafka where messages can be stored and referenced.
 - Internally, topics are distributed as partitions in different nodes and allow parallelized operations.
+- Data in Kafka is organized into topics. Internally, topics are partitioned in different servers.
+
+### 6.2: Kafka Set up
+
+
+### 6.3: Kafka Python
+Kafka Python is a library that can be used to set up Kafka Producers or Kafka Consumers. The library is simply a client and we will need to run the Kafka broker separately.
+
+### 6.3.1: Producers
+- Once a producer is configured, we can send a message with the `.send()` method.
+- The `.flush()` method is used to write a message immediately.
+   - It's useful for a demo to view the results immediately.
+   - In practice, flush() helps with performance by sending a batch of messages instead of a request for every message that is sent.
+
+The producer.py can be found [here](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/UdaConnect/modules/Kafka/producer.py)
+
+### 6.3.2: Consumers
+- Consumers are helpful to receive messages from a message broker.
+- Kafka consumers are typically part of a consumer group . 
+- When multiple consumers are subscribed to a topic and belong to the same consumer group, each consumer in the group will receive messages from a different subset of the partitions in the topic.
+
+The consumer.py can be found [consumer.py](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/UdaConnect/modules/Kafka/consumer.py)
+
+# Step 7: Kubernetes Configurations
+- Once the files for Microservices(Person,Location,Conenction) are created, we need to deploy them using the configuration files.
+- We need to write our configuration files for microserives services and message passing techinque and it can be placed under `deployment/` folder
+- The following command can be executed to deploy the services:
+```
+kubectl apply -f deployment/
+```
+
+The deployment files can be found [here](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/tree/main/UdaConnect/deployment)
+
+# Step 8: OpenAPI
+- The OpenAPI Specification, previously known as the Swagger Specification, is a specification for machine-readable interface files for describing, producing, consuming, and visualizing RESTful web services.
+- OpenAPI is a specification that provides us with a framework for documenting our RESTful APIs.
+
+### 8.1: REST Relies on Documentation
+- RESTful APIs are highly reliant on their documentation.
+- REST has little built-in enforcement for message structure and can be changed very easily.
+
+### 8.1.1: Documentation Can Be Formatted Differently
+- Documentation is very open-ended and can use different types of formatting and notation.
+
+### 8.1.2: OpenAPI
+- The OpenAPI specification provides us with a uniform way to detail our API resources and query for them
+- OpenAPI includes a wide range of optional fields that enrich our documentation
+- OpenAPI can be loaded into a tool called Swagger, a user-friendly, interactive API documentation accessible through a web page
+
+### 8.2: Creating Swagger Documentation
+- Swagger is an interactive tool that accepts OpenAPI documentation as input and provides a user interface for API documentation.
+- Swagger libraries are available for most programming languages and provide various ways to populate our API documentation.
+- [SwaggerHub](https://app.swaggerhub.com/) is a hosted version of Swagger that provides live previews and an interactive editor to check our OpenAPI syntax.
+
+### 8.3: Maintaining Documentation
+- Writing and maintaining documentation is often tedious. When we make a few changes to our code, we need to revisit our API documentation and reflect the latest changes.
+- API documentation often drifts and becomes cumbersome to maintain.
+- Rather than writing separate documentation for the work that we do, we can use integration tools to make our upkeep of documentation more manageable.
+
+### 8.4: Options for OpenAPI
+1. Manually update and maintain an OpenAPI specification file
+   - This is the traditional way in how we have separate sets of documentation for our APIs.
+- Example:
+```
+paths:
+  /items/{itemId}:
+     get:
+      description: Retrieve the item with itemId
+      parameters:
+        - in: path
+          name: itemId
+          schema:
+            type: string
+          required: true
+          description: ID of the item to get
+```
+2. Write our API specification as comments, and our libraries translate this into OpenAPI specifications
+   - This makes it easier to upkeep our documentation by keeping the documentation in the same area as our application code. This way, our code and documentation live in the same file, so there is more accountability to keep them consistent.
+- Example:
+```
+"""
+@oas [get] /items/{itemId}
+description: "By passing in an itemId you can retrieve the items information"
+parameters:
+- (path) category=all* {String} Item itemId
+"""
+def retrieve_items(item_id):
+    # Route logic here
+    pass
+```
+3. Use tightly-integrated libraries that will automatically detect how our code is structured and generate OpenAPI specifications for us
+   - Some libraries will allow us to auto-generate documentation. This is the easiest to maintain and provides us little overhead on managing our documentation at the expense of flexibility. When it works, this is a powerful way to optimize productivity.
+- Example:
+```
+@api.route("items/<item_id>")
+@api.param("item_id", "Unique Item ID", _in="query")
+class ItemResource(Resource):
+    @responds(schema=ItemSchema)
+    def get(self, item_id) -> Item:
+        # API Logic
+        pass
+```
+OpenAPI files can be found [here](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/tree/main/UdaConnect/docs)
+
+# Step 9: Postman
+- Postman is a commonly-used application to test APIs.
+- It is an HTTP client that tests HTTP requests, utilizing a graphical user interface, through which we obtain different types of responses that need to be subsequently validated.
+
+### 9.1: Getting Started With Postman
+- Postman provides useful tools to make HTTP requests and view the data in the HTTP responses. It can also be used for:
+    - Organizing and sharing HTTP requests as collections
+    - API documentation
+- To get started with Postman, go to: [Download Postman](http://postman.com/downloads/)
+
+### 9.2: Validating the Solution
+- To validate the solution, an API server is set up and the GET and POST requests are verified.
+
+### 9.3: Run the API Server
+- Run the application with python run in the same directory as app.py
+- The application will be served on localhost:30001
+
+### 9.4: Verify GET Request with Postman
+- Create a new tab in the workspace
+- Set up a GET request to localhost:30001/api/locations
+- Sending a GET request returns the JSON payload, the HTTP status and the time to process the request.
+
+### 9.5: Verify POST Request with Postman
+- Create a new tab in the workspace
+- Set up a POST request to localhost:30001/api/locations
+- Set up a JSON body so that data can be passed in the request
+- Sending a POST request returns the JSON payload, the HTTP status, the time to process the request, and the payload size
+
+The postman.json file can be found [here](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/UdaConnect/docs/postman)
 
 
