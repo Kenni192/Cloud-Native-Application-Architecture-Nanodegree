@@ -115,6 +115,10 @@ These pages should also load on your web browser:
 * `http://localhost:30001/api/` - Base path for API
 * `http://localhost:30000/` - Frontend ReactJS Application
 
+### Tips
+* We can access a running Docker container using `kubectl exec -it <pod_id> sh`. From there, we can `curl` an endpoint to debug network issues.
+* The starter project uses Python Flask. Flask doesn't work well with `asyncio` out-of-the-box. Consider using `multiprocessing` to create threads for asynchronous behavior in a standard Flask application.
+
 # Project Steps
 
 ## Step 1: Review and Plan
@@ -125,6 +129,12 @@ These pages should also load on your web browser:
 - Using the design decisions from the Step 1, create an architecture diagram of our microservice architecture showing the services and message passing techniques between them.
 - Continue to use Kubernetes and maintain the core functionality of the starter project.
 - We have to include at least three message passing strategies into our microservice architecture implementing Kafka, gRPC, and either enhancing or creating a RESTful API endpoint.
+
+### 2.1 Architecture Diagrams
+Our architecture diagram should focus on the services and how they talk to one another. For our project, we want the diagram in a `.png` format. Some popular free software and tools to create architecture diagrams:
+1. [Lucidchart](https://www.lucidchart.com/pages/)
+2. [Google Docs](docs.google.com) Drawings (In a Google Doc, _Insert_ - _Drawing_ - _+ New_)
+3. [Diagrams.net](https://app.diagrams.net/)
 
 The Architecture diagram can be found [here](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/UdaConnect/docs/architecture_design.PNG)
 
