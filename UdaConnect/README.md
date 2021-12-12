@@ -299,7 +299,27 @@ As a reminder, each module should have:
 - Data in Kafka is organized into topics. Internally, topics are partitioned in different servers.
 
 ### 6.2: Kafka Set up
-
+- First, the [kafka.yaml](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/UdaConnect/deployment/Kafka.yaml) manifests needs to be applied to the cluster
+```
+kubectl apply -f kafka.yaml
+```
+- This would bring up two pods, it can take 5-10 minutes, during that time pods may be in "ImagePullBackOff" or "PodInitializing" state several times.
+- It is useful to use the "kubectl wait" to wait until the kafka pod is ready
+```
+kubectl wait pod --timeout 300s --for=condition=Ready \
+       -l app.kubernetes.io/name=kafka
+```
+- Now let's create a Topic
+```
+kubectl exec -it kafka-0 -- kafka-topics.sh \
+       --create --bootstrap-server kafka-headless:9092 \
+       --replication-factor 1 --partitions 1 \ 
+       --topic mytopic
+# output:
+# Defaulted container "kafka" out of: kafka, volume-permissions (init)
+# Created topic mytopic.
+```
+If this step fails, we need to verify that the kafka-0 and kafka-zookeeper-0 pods are in "Running" state.
 
 ### 6.3: Kafka Python
 Kafka Python is a library that can be used to set up Kafka Producers or Kafka Consumers. The library is simply a client and we will need to run the Kafka broker separately.
@@ -319,9 +339,37 @@ The producer.py can be found [here](https://github.com/Harini-Pavithra/Cloud-Nat
 
 The consumer.py can be found [consumer.py](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/UdaConnect/modules/Kafka/consumer.py)
 
+### 6.4: Running Producer and Consumer
+- Once the Topic is created, in separate terminals start the consumer and producer.
+```
+kubectl exec -it kafka-0 -- kafka-console-consumer.sh \
+        --bootstrap-server kafka-headless:9092 \
+        --topic mytopic
+# output:
+# Defaulted container "kafka" out of: kafka, volume-permissions (init)
+```
+```
+kubectl exec -it kafka-0 -- kafka-console-producer.sh \
+       --broker-list kafka-headless:9092 \
+       --topic mytopic
+# output:
+# Defaulted container "kafka" out of: kafka, volume-permissions (init)
+# >message 1
+# >message 2
+```
+- The "message 1" and "message 2" should appear in the consumer output. Exit producer with ctrl+d, and consumer with ctrl+c.
+
+### 6.5: Kafka Deletion
+The kafka/zookeeper installation can be deleted by removing the k8s resources and storage persistent-volume-claims "pvc" (the persistent volumes "pv" should be deleted automatically)
+```
+kubectl delete -f kafka.yaml
+kubectl delete pvc data-kafka-0 data-kafka-zookeeper-0
+```
+
 # Step 7: Kubernetes Configurations
 - Once the files for Microservices(Person,Location,Conenction) are created, we need to deploy them using the configuration files.
 - We need to write our configuration files for microserives services and message passing techinque and it can be placed under `deployment/` folder
+- After applying the configuration files successfully, we can see the Pods is in `Running` state
 - The following command can be executed to deploy the services:
 ```
 kubectl apply -f deployment/
