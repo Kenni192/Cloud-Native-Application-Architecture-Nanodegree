@@ -272,4 +272,19 @@ As a reminder, each module should have:
 2. Its own corresponding DockerHub repository
 3. `requirements.txt` for `pip` packages
 
+# Step 6: Implement Kafka Broker
+### Kafka Use Cases
+- Kafka is a special type of message queue that is often used to handle large volumes of data generated continuously as events.
+- Some examples include application logs and user activity — things that represent that "something has happened."
+
+### Architecture Overview
+- Kafka is a distributed system, which means that it is an application that is powered by multiple nodes.
+- When a producer writes data to Kafka, it stores the data inside of topics.
+
+![Kafka](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/UdaConnect/Images/Kafka.PNG)
+
+### Topics
+- Topics are abstractions of Kafka where messages can be stored and referenced.
+- Internally, topics are distributed as partitions in different nodes and allow parallelized operations.
+
 
