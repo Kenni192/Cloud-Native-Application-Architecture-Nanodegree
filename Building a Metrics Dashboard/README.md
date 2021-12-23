@@ -54,7 +54,7 @@ vagrant ssh
 curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
 ```
 
-## 2.2: Installing Grafana and Prometheus
+## 2.2: Installing Prometheus
 - With Helm installed, it is much easier to install Grafana and Prometheus.
 - These are the lines of code we will want to run
 
@@ -70,22 +70,13 @@ helm repo add stable https://charts.helm.sh/stable
 helm repo update
 helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring --kubeconfig /etc/rancher/k3s/k3s.yaml
 ```
-3. Grafana site can be accessed by `https://127.0.0.1:3000/` or `localhost:3000`
-![4.Grafana_Home_Page](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/4.Grafana_Home_Page.PNG)
-
-4. Verify that it installed
+3. Verify that it installed
 ```
 kubectl get pods,svc --namespace=monitoring
 ```
 ![2.Monitoring](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/2.Monitoring.PNG)
 ![3.Monitoring_pods_services](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/3.Monitoring_pods_services.PNG)
 
-### Note:
-When installing via the Prometheus Helm chart, the default Grafana credentials are:
-```
-username: admin 
-password: prom-operator
-```
 
 ## 2.3: Install Jaeger
 - We will now install Jaeger Tracing to our cluster
@@ -109,3 +100,65 @@ kubectl create -f https://raw.githubusercontent.com/jaegertracing/jaeger-operato
 ![5.Jaegar](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/5.Jaegar.PNG)
 
 Great! We have installed Jaeger, Prometheus, and Grafana. We are now ready to work!
+
+## Step 3: Deploying the Application
+- We need to ensure that we have an application to monitor and observe. 
+
+## 3.1: Install the Python application
+- We will install a simple Python Application. It will contain three items.
+  - A frontend service that acts as the web page that you will visit with your browser.
+  - A backend service that will perform simple tasks and return them to the front end.
+  - A trial service that will have tracing enabled for Jaeger.
+- Navigate to `sample-app/manifests` in the files directory
+- Run the below command to install the application
+```
+kubectl apply -f app/
+```
+![7.Running_Pods](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/7.Running_Pods.PNG)
+
+## 3.2: Exposing Grafana
+- It is important to be able to log into Grafana, so let's look at how we can expose Grafana.
+- Run `kubectl get pod -n monitoring | grep grafana` and look for something named `promethus-grafana-########` where # are random characters.
+- copy `promethus-grafana-########` line.
+- Run `kubectl port-forward -n monitoring promethus-grafana-######## 3000`
+- Grafana site can be accessed by `https://127.0.0.1:3000/` or `localhost:3000`
+- Log in with username and password.
+
+### Note: 
+- Every time we run kubectl port-forward, it will take control of that terminal session. We will need to open a new session (i.e., a new terminal tab or window) to continue working.
+- When installing via the Prometheus Helm chart, the default Grafana credentials are:
+```
+username: admin 
+password: prom-operator
+```
+![4.Grafana_Home_Page](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/4.Grafana_Home_Page.PNG)
+
+## 3.3: Exposing the application
+- Similar to Grafana, our frontend needs to be exposed to the internet. Be sure to open a new session in either a new terminal tab or terminal window so we can do another `kubectl port-forward`
+- Run the below command to expose the application
+```
+kubectl port-forward svc/frontend-service 8080:8080
+```
+- In the web browser navigate to `localhost:8080`
+![6.front-end](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/6.front-end.PNG)
+
+## Step 4: Checking the Targets
+- Run the below command and copy the 1st running service.
+```
+kubectl get pods -n svc
+```
+- Run the port-forward command
+```
+kubectl port-forward -n monitoring svc/promethus-kube-promethus-promethus 9090:9090
+```
+- In browser navigate to `https://127.0.0.1:9090/targets`
+- All the services should be in `UP` status 
+
+![10.Targets](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/10.Targets.PNG)
+
+## Step 5: Install Jaeger
+- create jaeger.yaml
+- Run the below command to install Jaeger services
+```
+kubectl apply -f jaeger.yaml -n obervability
+```
