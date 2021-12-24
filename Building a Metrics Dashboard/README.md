@@ -351,3 +351,7 @@ Latency: This measures the latency in requests in both the frontend and backend
 
 ### Note:
 For the screenshots, we can store all of our answer images in the [answer-img](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/tree/main/Building%20a%20Metrics%20Dashboard/answer-img) directory.
+
+# Mentor Review from Udacity
+
+![Mentor_Review_Project_3](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/image/Mentor_Review_Project_3.PNG)
