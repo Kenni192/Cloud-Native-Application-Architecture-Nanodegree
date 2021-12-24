@@ -157,8 +157,197 @@ kubectl port-forward -n monitoring svc/promethus-kube-promethus-promethus 9090:9
 ![10.Targets](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/10.Targets.PNG)
 
 ## Step 5: Install Jaeger
-- create jaeger.yaml
+- create [jaeger.yaml](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/manifests/app/jaeger.yaml)
 - Run the below command to install Jaeger services
 ```
 kubectl apply -f jaeger.yaml -n obervability
 ```
+The command above will create a Jaeger instance with the name simplest in the observability namespace. we can verify using:
+```
+# Should return ‘simplest’
+# Run either one of the following
+kubectl get deployment -n observability
+kubectl get jaegers -n observability
+```
+
+## Step 6: Accessing the service
+- Run the below commands to access the Jaeger service
+```
+kubectl get pods -n obervability -l=app="jaeger" -o name
+#copy the ouput
+kubectl port-forward -n observability output(pod/simplest-xxx) 16686:16686
+```
+- In the browser navigate to `https://127.0.0.1/16686`
+- Run the below command to verify ingress ports
+```
+ingress_name=$(kubectl get -n observability ingress -o jsonpath='{.items[0].metadata.name}'); \
+    ingress_port=$(kubectl get -n observability ingress -o jsonpath='{.items[0].spec.defaultBackend.service.port.number}'); \
+    echo -e "\n\n${ingress_name}.observability.svc.cluster.local:${ingress_port}"
+#Copy the output
+```
+
+![16.Jeager_UI](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/16.Jeager_UI.PNG)
+
+## Step 7: Adding the Data Source
+- In the browser navigate to `https://127.0.0.1:3000`(grafana)
+- From the options, select `data source --> add data source`
+- In URL option, paste the ouput from the above step with the port 16686 
+- Click on `save and test`
+- Now we can the see the Jaeger data source added under the Data Source option
+
+![14.Data_Sources](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/14.Data_Sources.PNG)
+
+![15.Data_sources_1](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/15.Data_sources_1.PNG)
+
+![17.Data_Source_Added](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/17.Data_Source_Added.PNG)
+
+## Step 8: Tracing
+- In Jaeger UI under service option select the service that need to be traced(service) and click on `Find Traces`
+
+![16.Jeager_UI](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/16.Jeager_UI.PNG)
+
+- In grafana page, click on explore  and select jaeger from the options then select the services.
+
+![29.Jaegar_Metric](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/29.Jaegar_Metric.png)
+
+## Step 9 : Todo in README 
+### Verify the monitoring installation
+*TODO:* run `kubectl` command to show the running pods and services for all components. Take a screenshot of the output and include it here to verify the installation
+### Namespace: default
+
+![8.Get_all](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/8.Get_all.PNG)
+
+### Namespace: monitoring
+
+![2.Monitoring](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/2.Monitoring.PNG)
+
+### Namespace: observability
+
+![5.Jaegar](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/5.Jaegar.PNG)
+
+### Setup the Jaeger and Prometheus source
+*TODO:* Expose Grafana to the internet and then setup Prometheus as a data source. Provide a screenshot of the home page after logging into Grafana.
+
+![4.Grafana_Home_Page](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/4.Grafana_Home_Page.PNG)
+
+### Create a Basic Dashboard
+*TODO:* Create a dashboard in Grafana that shows Prometheus as a source. Take a screenshot and include it here.
+
+![23.Data_sources](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/23.Data_sources.PNG)
+
+![24.Dashboard](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/24.Dashboard.PNG)
+
+### Describe SLO/SLI
+*TODO:* Describe, in own words, what the SLIs are, based on an SLO of *monthly uptime* and *request response time*.
+
+### SLO
+- A Service-Level Objective (SLO) is a measurable goal set by the SRE team to ensure a standard level of performance during a specified period of time.
+- When creating an SLO, it is important to be customer-centric. If we keep user experience and expectations at the center of our planning, we will have a strong SLO strategy. A common way to make sure we are customer-centered in our strategy is to map out a user journey for the application.
+SLI.
+- A Service-Level Indicator (SLI) is a specific metric used to measure the performance of a service.
+- For example, suppose that our team has the following SLO:The application will have an uptime of 99.9% during the next year. In this case,our SLI would be the actual measurement of the uptime. Perhaps during that year,we actually achieved 99.5% uptime or 97.3% uptime. These measurements are our SLIs—they indicate the level of performance our service actually exhibited, and show us whether we achieved our SLO 
+
+## Creating SLI metrics.
+*TODO:* It is important to know why we want to measure certain metrics for our customer. Describe in detail 5 metrics to measure these SLIs. 
+
+- Latency: The amount of time it takes from when a request is made by the user to the time it takes for the response to get back to that user.
+
+- Failure Rate: The percentage of requests that are failing.
+
+- Throughout: The requests received per second.
+
+- Uptime: The percentage of system availability during a defined period.
+
+- Traffic: The amount of stress on a system from demand. 
+
+### Create a Dashboard to measure our SLIs
+*TODO:* Create a dashboard to measure the uptime of the frontend and backend services We will also want to measure to measure 40x and 50x errors. Create a dashboard that show these values over a 24 hour period and take a screenshot.
+
+### Uptime
+The below Metrics command is used to create Uptime dashboard
+```
+sum(up{container=~"backend|frontend"}) by(pod)
+```
+
+![12.Uptime](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/12.Uptime.PNG)
+
+### Error
+The below Metrics command is used to create Error dashboard
+```
+sum(flask_http_request_total{container=~"backend|frontend",status=~"403|404|410|500|503"}) by(status, container)
+curl 127.0.0.1:30001/sample
+curl 127.0.0.1:3000/sample
+```
+
+![31.Error_40x](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/31.Error_40x.PNG)
+
+![32.Final_Dashboard](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/32.Final_Dashboard.PNG)
+
+### Tracing our Flask App
+*TODO:*  We will create a Jaeger span to measure the processes on the backend. Once we fill in the span, provide a screenshot of it here.
+
+![28.Jaegar_Traces](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/28.Jaegar_Traces.png)
+
+## Jaeger in Dashboards
+*TODO:* Now that the trace is running, let's add the metric to our current Grafana dashboard. Once this is completed, provide a screenshot of it here.
+
+![29.Jaegar_Metric](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/29.Jaegar_Metric.png)
+
+## Report Error
+*TODO:* Using the template below, write a trouble ticket for the developers, to explain the errors that we are seeing (400, 500, latency) and to let them know the file that is causing the issue.
+
+- TROUBLE TICKET
+  - Name:404 Not Found on backend service
+  - Date: 13-11-2021
+  - Subject: API endpoint not found
+  - Affected Area: Backend service
+  - Severity: HIGH
+  - Description: The calls from frontend to the backend are returning a 404
+
+## Creating SLIs and SLOs
+*TODO:* We want to create an SLO guaranteeing that our application has a 99.95% uptime per month. Name three SLIs that we would use to measure the success of this SLO.
+
+Here the SLOs is that our application has 99.95% uptime per month. To metigate this SLOs we need to take some SLI which ensue that this SLO.
+We will measure the "Four Golden Signals", for instance:
+1. Percentage of CPU and memory consumption in the last 1 month (for saturation).
+2. Percentage of Infrastructure uptime in the last 1 month (for error).
+3. The average number of requests per minute in the last 24 hours (for traffic).
+4. Percentage of request response time less than 250 milliseconds (for latency).
+We also need some errors budget because all applications will not always work perfectly.
+1. Our application will produce 5xx status code less than 1% in a month
+2. Service downtime will be 0.001% in next month.
+
+## Building KPIs for our plan
+*TODO*: Now that we have our SLIs and SLOs, create KPIs to accurately measure these metrics. We will make a dashboard for this, but first write them down here.
+
+* Latency
+  - The time it takes for a request to be served by an application, often measured in millisecond
+  - It is very important to keep track of successful and fail(error) response to requests
+
+* Error rate 
+  - Number of HTTP error caused by application to total number of HTTP response
+  - We need to ensure the application has a very low error rate
+
+* CPU 
+  - Amount of CPU used by the application
+  - We need to ensure CPU usage not more than 75%, otherwise it can have bad impact on the application
+
+### Final Dashboard
+*TODO*: Create a Dashboard containing graphs that capture all the metrics of your KPIs and adequately representing our SLIs and SLOs. Include a screenshot of the dashboard here, and write a text description of what graphs are represented in the dashboard. 
+
+Error Rate: This displays the number of 4xx status codes from both the frontend and backend
+
+![19.KPI_1](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/19.KPI_1.PNG)
+
+CPU: This keeps track of the CPU usage in both the frontend and backend
+
+![20.KPI_2](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/20.KPI_2.PNG)
+
+Latency: This measures the latency in requests in both the frontend and backend
+
+![21.KPI_3](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/21.KPI_3.PNG)
+
+![22.KPIs](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/answer-img/22.KPIs.PNG)
+
+### Note:
+For the screenshots, we can store all of our answer images in the [answer-img](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/tree/main/Building%20a%20Metrics%20Dashboard/answer-img) directory.
