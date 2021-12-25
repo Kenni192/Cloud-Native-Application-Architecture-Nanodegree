@@ -1,0 +1,663 @@
+[INFO] 20.04 CIS Docker Community Edition Benchmark
+[INFO] 1 Host Configuration
+[INFO] 1.1 Linux Hosts Specific Configuration
+[FAIL] 1.1.1 Ensure a separate partition for containers has been created (Automated)
+[WARN] 1.1.2 Ensure only trusted users are allowed to control Docker daemon (Automated)
+[FAIL] 1.1.3 Ensure auditing is configured for the docker daemon (Automated)
+	 /bin/sh: 1: auditctl: not found
+	 
+[FAIL] 1.1.4 Ensure auditing is configured for Docker files and directories - /run/containerd (Automated)
+	 /bin/sh: 1: auditctl: not found
+	 
+[FAIL] 1.1.5 Ensure auditing is configured for Docker files and directories - /var/lib/docker (Automated)
+	 /bin/sh: 1: auditctl: not found
+	 
+[FAIL] 1.1.6 Ensure auditing is configured for Docker files and directories - /etc/docker (Automated)
+	 /bin/sh: 1: auditctl: not found
+	 
+[FAIL] 1.1.7 Ensure auditing is configured for Docker files and directories - docker.service (Automated)
+	 /bin/sh: 3: auditctl: not found
+	 
+[FAIL] 1.1.8 Ensure auditing is configured for Docker files and directories - containerd.sock (Automated)
+[FAIL] 1.1.9 Ensure auditing is configured for Docker files and directories - docker.socket (Automated)
+[FAIL] 1.1.10 Ensure auditing is configured for Docker files and directories - /etc/default/docker (Automated)
+	 /bin/sh: 1: auditctl: not found
+	 
+[FAIL] 1.1.11 Ensure auditing is configured for Docker files and directories - /etc/docker/daemon.json (Automated)
+	 /bin/sh: 1: auditctl: not found
+	 
+[FAIL] 1.1.12 Ensure auditing is configured for Docker files and directories - /etc/containerd/config.toml (Automated)
+	 /bin/sh: 1: auditctl: not found
+	 
+[FAIL] 1.1.13 Ensure auditing is configured for Docker files and directories - /etc/sysconfig/docker (Automated)
+	 /bin/sh: 1: auditctl: not found
+	 
+[FAIL] 1.1.14 Ensure auditing is configured for Docker files and directories - /usr/bin/containerd (Automated)
+	 /bin/sh: 1: auditctl: not found
+	 
+[FAIL] 1.1.15 Ensure auditing is configured for Docker files and directories - /usr/bin/containerd-shim (Automated)
+	 /bin/sh: 1: auditctl: not found
+	 
+[FAIL] 1.1.16 Ensure auditing is configured for Docker files and directories - /usr/bin/containerd-shim-runc-v1 (Automated)
+	 /bin/sh: 1: auditctl: not found
+	 
+[FAIL] 1.1.17 Ensure auditing is configured for Docker files and directories - /usr/bin/containerd-shim-runc-v2 (Automated)
+	 /bin/sh: 1: auditctl: not found
+	 
+[FAIL] 1.1.18 Ensure auditing is configured for Docker files and directories - /usr/bin/runc (Automated)
+	 /bin/sh: 1: auditctl: not found
+	 
+[INFO] 1.2 General Configuration
+[WARN] 1.2.1 Ensure the container host has been Hardened (Manual)
+[WARN] 1.2.2 Ensure that the version of Docker is up to date (Manual)
+[INFO] 2 Docker daemon configuration
+[WARN] 2.1 Run the Docker daemon as a non-root user, if possible (Manual)
+[PASS] 2.2 Ensure network traffic is restricted between containers on the default bridge (Automated)
+[PASS] 2.3 Ensure the logging level is set to 'info' (Automated)
+[PASS] 2.4 Ensure Docker is allowed to make changes to iptables (Automated)
+[WARN] 2.5 Ensure insecure registries are not used (Automated)
+[PASS] 2.6 Ensure aufs storage driver is not used (Automated)
+[FAIL] 2.7 Ensure TLS authentication for Docker daemon is configured (Automated)
+	 root         923       1  0 11:58 ?        00:00:00 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+	 harini     13021   13019  0 13:31 pts/0    00:00:00 grep dockerd
+	 
+[WARN] 2.8 Ensure the default ulimit is configured appropriately (Manual))
+[FAIL] 2.9 Enable user namespace support (Automated)
+	 panic: reflect: indirection through nil pointer to embedded struct [recovered]
+	 	panic: reflect: indirection through nil pointer to embedded struct
+	 
+	 goroutine 1 [running]:
+	 text/template.errRecover(0xc00061f2e8)
+	 	/usr/local/go/src/text/template/exec.go:169 +0x1c5
+	 panic(0x55f5e99b1ec0, 0x55f5e9cab308)
+	 	/usr/local/go/src/runtime/panic.go:965 +0x1b9
+	 reflect.Value.FieldByIndex(0x55f5e9b492e0, 0xc00004f940, 0x99, 0xc000131130, 0x2, 0x2, 0x0, 0x55f5e9d3a1a8, 0x55f5e9978b20)
+	 	/usr/local/go/src/reflect/value.go:889 +0x325
+	 text/template.(*state).evalField(0xc00061f258, 0x55f5e9b492e0, 0xc00004f940, 0x99, 0x7ffe2441e3c5, 0xf, 0x55f5e9d23d60, 0xc0001dc810, 0xc00014d5c0, 0x1, ...)
+	 	/usr/local/go/src/text/template/exec.go:616 +0x4ed
+	 text/template.(*state).evalFieldChain(0xc00061f258, 0x55f5e9b492e0, 0xc00004f940, 0x99, 0x55f5e9b492e0, 0xc00004f940, 0x99, 0x55f5e9d23d60, 0xc0001dc810, 0xc00014d5b0, ...)
+	 	/usr/local/go/src/text/template/exec.go:569 +0x225
+	 text/template.(*state).evalFieldNode(0xc00061f258, 0x55f5e9b492e0, 0xc00004f940, 0x99, 0xc0001dc810, 0xc00014d5c0, 0x1, 0x1, 0x55f5e9a3ff60, 0x55f5eaabe9d0, ...)
+	 	/usr/local/go/src/text/template/exec.go:533 +0x115
+	 text/template.(*state).evalCommand(0xc00061f258, 0x55f5e9b492e0, 0xc00004f940, 0x99, 0xc0001dc7e0, 0x55f5e9a3ff60, 0x55f5eaabe9d0, 0x99, 0xd0, 0xc0001cd450, ...)
+	 	/usr/local/go/src/text/template/exec.go:461 +0x8f0
+	 text/template.(*state).evalPipeline(0xc00061f258, 0x55f5e9b492e0, 0xc00004f940, 0x99, 0xc0001c7560, 0x55f5e86427d6, 0xc0001e8058, 0xc00004f900)
+	 	/usr/local/go/src/text/template/exec.go:435 +0x125
+	 text/template.(*state).walk(0xc00061f258, 0x55f5e9b492e0, 0xc00004f940, 0x99, 0x55f5e9d23b68, 0xc0001dc840)
+	 	/usr/local/go/src/text/template/exec.go:254 +0x38a
+	 text/template.(*state).walk(0xc00061f258, 0x55f5e9b492e0, 0xc00004f940, 0x99, 0x55f5e9d23e38, 0xc0001dc7b0)
+	 	/usr/local/go/src/text/template/exec.go:263 +0x13c
+	 text/template.(*Template).execute(0xc00004f900, 0x55f5e9cca858, 0xc000331aa0, 0x55f5e9b492e0, 0xc00004f940, 0x0, 0x0)
+	 	/usr/local/go/src/text/template/exec.go:217 +0x1c6
+	 text/template.(*Template).Execute(...)
+	 	/usr/local/go/src/text/template/exec.go:200
+	 github.com/docker/cli/cli/command/system.formatInfo(0x55f5e9d36fa8, 0xc00052f040, 0x0, 0xc00014d3f0, 0x1, 0x1, 0xc0002c1ea0, 0x0, 0x0, 0x0, ...)
+	 	/go/src/github.com/docker/cli/cli/command/system/info.go:511 +0x1fd
+	 github.com/docker/cli/cli/command/system.runInfo(0xc0001acb00, 0x55f5e9d36fa8, 0xc00052f040, 0xc00014cc10, 0x0, 0x0)
+	 	/go/src/github.com/docker/cli/cli/command/system/info.go:88 +0x3a5
+	 github.com/docker/cli/cli/command/system.NewInfoCommand.func1(0xc0001acb00, 0xc00007d680, 0x0, 0x2, 0x0, 0x0)
+	 	/go/src/github.com/docker/cli/cli/command/system/info.go:54 +0x48
+	 github.com/docker/cli/vendor/github.com/spf13/cobra.(*Command).execute(0xc0001acb00, 0xc0001b54b0, 0x2, 0x2, 0xc0001acb00, 0xc0001b54b0)
+	 	/go/src/github.com/docker/cli/vendor/github.com/spf13/cobra/command.go:850 +0x472
+	 github.com/docker/cli/vendor/github.com/spf13/cobra.(*Command).ExecuteC(0xc0000e42c0, 0xc0001b54a0, 0x3, 0x3)
+	 	/go/src/github.com/docker/cli/vendor/github.com/spf13/cobra/command.go:958 +0x375
+	 github.com/docker/cli/vendor/github.com/spf13/cobra.(*Command).Execute(...)
+	 	/go/src/github.com/docker/cli/vendor/github.com/spf13/cobra/command.go:895
+	 main.runDocker(0xc00052f040, 0x55f5e9cccdf8, 0xc000010028)
+	 	/go/src/github.com/docker/cli/cmd/docker/docker.go:287 +0x1eb
+	 main.main()
+	 	/go/src/github.com/docker/cli/cmd/docker/docker.go:298 +0xfc
+	 
+[PASS] 2.10 Ensure the default cgroup usage has been confirmed (Automated)
+[PASS] 2.11 Ensure base device size is not changed until needed (Automated)
+[PASS] 2.12 Ensure that authorization for Docker client commands is enabled (Automated)
+[PASS] 2.13 Ensure centralized and remote logging is configured (Automated)
+[PASS] 2.14 Ensure containers are restricted from acquiring new privileges (Automated)
+[PASS] 2.15 Ensure live restore is Enabled (Automated)
+[PASS] 2.16 Ensure Userland Proxy is Disabled (Automated)
+[WARN] 2.17 Ensure that a daemon-wide custom seccomp profile is applied if appropriate (Manual)
+[FAIL] 2.18 Ensure that experimental features are not implemented in production (Automated)
+	 experimental=
+	 Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/version": dial unix /var/run/docker.sock: connect: permission denied
+	 
+[INFO] 3 Docker daemon configuration files
+[PASS] 3.1 Ensure that docker.service file ownership is set to root:root (Automated)
+[PASS] 3.2 Ensure that docker.service file permissions are appropriately set (Automated)
+[PASS] 3.3 Ensure that docker.socket file ownership is set to root:root (Automated)
+[PASS] 3.4 Ensure that docker.socket file permissions are set to 644 or more restrictive (Automated)
+[PASS] 3.5 Ensure that /etc/docker directory ownership is set to root:root (Automated)
+[PASS] 3.6 Ensure that /etc/docker directory permissions are set to 755 or more restrictive (Automated)
+[FAIL] 3.7 Ensure that registry certificate file ownership is set to root:root (Automated)
+	 stat: cannot statx '/etc/docker/certs.d/*': No such file or directory
+	 
+[FAIL] 3.8 Ensure that registry certificate file permissions are set to 444 or more restrictive (Automated)
+	 stat: cannot statx '/etc/docker/certs.d/*': No such file or directory
+	 
+[WARN] 3.9 Ensure that TLS CA certificate file ownership is set to root:root (Automated)
+[WARN] 3.10 Ensure that TLS CA certificate file permissions are set to 444 or more restrictive (Automated)
+[WARN] 3.11 Ensure that Docker server certificate file ownership is set to root:root (Automated)
+[WARN] 3.12 Ensure that Docker server certificate file permissions are set to 444 or more restrictive (Automated)
+[WARN] 3.13 Ensure that Docker server certificate key file ownership is set to root:root (Automated)
+[WARN] 3.14 Ensure that the Docker server certificate key file permissions are set to 400 (Automated)
+[PASS] 3.15 Ensure that Docker socket file ownership is set to root:docker (Automated)
+[PASS] 3.16 Ensure that Docker socket file permissions are set to 660 or more restrictive (Automated)
+[PASS] 3.17 Ensure that daemon.json file ownership is set to root:root (Automated)
+[FAIL] 3.18 Ensure that daemon.json file permissions are set to 644 or more restrictive (Automated)
+	 '/etc/docker/daemon.json' permissions=777
+	 
+[PASS] 3.19 Ensure that /etc/default/docker file ownership is set to root:root (Automated)
+[FAIL] 3.20 Ensure that /etc/sysconfig/docker file permissions are set to 644 or more restrictive (Automated)
+	 stat: cannot statx '/etc/sysconfig/docker': No such file or directory
+	 
+[FAIL] 3.21 Ensure that the /etc/sysconfig/docker file ownership is set to root:root (Automated)
+	 stat: cannot statx '/etc/sysconfig/docker': No such file or directory
+	 
+[PASS] 3.22 Ensure that /etc/default/docker file permissions are set to 644 or more restrictive (Automated)
+[PASS] 3.23 Ensure that the Containerd socket file ownershi is set to root:root (Automated)
+[WARN] 3.24 Ensure that the Containerd socket file permissions are set to 660 or more restrictive (Automated)
+[INFO] 4 Container Images and Build File Configuration
+[FAIL] 4.1 Ensure that a user for the container has been created (Automated)
+	 xargs: warning: options --max-args and --replace/-I/-i are mutually exclusive, ignoring previous --max-args value
+	 Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/containers/json": dial unix /var/run/docker.sock: connect: permission denied
+	 
+[WARN] 4.2 Ensure that containers use only trusted base images (Manual)
+[WARN] 4.3 Ensure that unnecessary packages are not installed in the container (Manual)
+[WARN] 4.4 Ensure images are scanned and rebuilt to include security patches (Manual)
+[FAIL] 4.5 Ensure Content trust for Docker is Enabled (Automated)
+	 DOCKER_CONTENT_TRUST=
+	 
+[WARN] 4.6 Ensure HEALTHCHECK instructions have been added to the container images (Automated)
+[WARN] 4.7 Ensure update instructions are not use alone in the Dockerfile (Manual)
+[WARN] 4.8 Ensure setuid and setgid permissions are removed (Manual)
+[WARN] 4.9 Ensure COPY is used instead of ADD in Dockerfile (Manual)
+[WARN] 4.10 Ensure secrets are not stored in Dockerfiles (Manual)
+[WARN] 4.11 Ensure only verified packages are are Installed (Manual)
+[INFO] 5 Container Runtime Configuration
+[WARN] 5.1 Ensure that, if applicable, an AppArmor Profile is enabled (Automated)
+[WARN] 5.2 Ensure that, if applicable, SELinux security options are set(Automated)
+[WARN] 5.3 Ensure that Linux Kernel capabilities are restricted within containers (Automated)
+[PASS] 5.4 Ensure that privileged containers are not used (Automated)
+[PASS] 5.5 Ensure sensitive host system directories are not mounted on containers (Automated)
+[WARN] 5.6 Ensure sshd is not run within containers (Automated)
+[WARN] 5.7 Ensure privileged ports are not mapped within containers (Automated)
+[WARN] 5.8 Ensure that only needed ports are open on the container (Manual)
+[PASS] 5.9 Ensure that the host's network namespace is not shared (Automated)
+[FAIL] 5.10 Ensure that the memory usage for container is limited (Automated)
+	 Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/containers/json?all=1": dial unix /var/run/docker.sock: connect: permission denied
+	 "docker inspect" requires at least 1 argument.
+	 See 'docker inspect --help'.
+	 
+	 Usage:  docker inspect [OPTIONS] NAME|ID [NAME|ID...]
+	 
+	 Return low-level information on Docker objects
+	 
+[FAIL] 5.11 Ensure that CPU priority is set appropriately on container (Automated)
+	 Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/containers/json?all=1": dial unix /var/run/docker.sock: connect: permission denied
+	 "docker inspect" requires at least 1 argument.
+	 See 'docker inspect --help'.
+	 
+	 Usage:  docker inspect [OPTIONS] NAME|ID [NAME|ID...]
+	 
+	 Return low-level information on Docker objects
+	 
+[PASS] 5.12 Ensure that the container's root filesystem is mounted as read only (Automated)
+[PASS] 5.13 Ensure that incoming container traffic is bound to a specific host interface (Automated)
+[FAIL] 5.14 Ensure that the 'on-failure' container restart policy is set to '5' (Automated)
+	 Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/containers/json?all=1": dial unix /var/run/docker.sock: connect: permission denied
+	 "docker inspect" requires at least 1 argument.
+	 See 'docker inspect --help'.
+	 
+	 Usage:  docker inspect [OPTIONS] NAME|ID [NAME|ID...]
+	 
+	 Return low-level information on Docker objects
+	 
+[PASS] 5.15 Ensure that the host's process namespace is not shared (Automated)
+[PASS] 5.16 Ensure that the host's IPC namespace is not shared (Automated)
+[WARN] 5.17 Ensure that host devices are not directly exposed to containers (Manual)
+[WARN] 5.18 Ensure that the default ulimit is overwritten at runtime, only if needed (Manual)
+[WARN] 5.19 Ensure mount propagation mode is not set to shared (Automated)
+[PASS] 5.20 Ensure that the host's UTS namespace is not shared (Automated)
+[PASS] 5.21 Ensure the default seccomp profile is not Disabled (Automated)
+[PASS] 5.22 Ensure that docker exec commands are not used with the privileged option (Automated)
+[FAIL] 5.23 Ensure that docker exec commands are not used with the user=root option (Manual)
+	 /bin/sh: 1: ausearch: not found
+	 
+[WARN] 5.24 Ensure cgroup usage is confirmed (Automated)
+[FAIL] 5.25 Ensure that the container is restricted from acquiring additional privileges (Automated)
+	 Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/containers/json?all=1": dial unix /var/run/docker.sock: connect: permission denied
+	 "docker inspect" requires at least 1 argument.
+	 See 'docker inspect --help'.
+	 
+	 Usage:  docker inspect [OPTIONS] NAME|ID [NAME|ID...]
+	 
+	 Return low-level information on Docker objects
+	 
+[WARN] 5.26 Ensure that container health is checked at runtime (Automated)
+[WARN] 5.27 Ensure that Docker commands always make use of the latest  version of their image (Manual)
+[FAIL] 5.28 Ensure that the PIDs cgroup limit is used (Automated)
+	 Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/containers/json?all=1": dial unix /var/run/docker.sock: connect: permission denied
+	 "docker inspect" requires at least 1 argument.
+	 See 'docker inspect --help'.
+	 
+	 Usage:  docker inspect [OPTIONS] NAME|ID [NAME|ID...]
+	 
+	 Return low-level information on Docker objects
+	 
+[PASS] 5.29 Ensure that Docker's default bridge docker0 is not used (Manual)
+[PASS] 5.30 Ensure that the host's user namespaces is not shared (Automated)
+[FAIL] 5.31 Ensure that the Docker socket is not mounted inside any containers (Automated)
+	 Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/containers/json?all=1": dial unix /var/run/docker.sock: connect: permission denied
+	 "docker inspect" requires at least 1 argument.
+	 See 'docker inspect --help'.
+	 
+	 Usage:  docker inspect [OPTIONS] NAME|ID [NAME|ID...]
+	 
+	 Return low-level information on Docker objects
+	 
+[INFO] 6 Docker Security Operations
+[WARN] 6.1 Ensure that image sprawl is avoided (Manual)
+[WARN] 6.2 Ensure that container sprawl is avoided (Manual)
+[INFO] 7 Docker Swarm Configuration
+[INFO] 7.1 Ensure swarm mode is not Enabled, if not needed (Automated)
+[INFO] 7.2 Ensure that the minimum number of manager nodes have been created in a swarm (Automated)
+[INFO] 7.3 Ensure that swarm services are bound to a specific host interface (Automated)
+[INFO] 7.4 Ensure that all Docker swarm overlay networks are encrypted (Automated)
+[INFO] 7.5 Ensure that Docker's secret management commands are used for managing secrets in a swarm cluster (Manual)
+[INFO] 7.6 Ensure that swarm manager is run in auto-lock mode (Automated)
+[INFO] 7.7 Ensure that the swarm manager auto-lock key is rotated periodically (Manual)
+[INFO] 7.8 Ensure that node certificates are rotated as appropriate (Manual)
+[INFO] 7.9 Ensure that CA certificates are rotated as appropriate (Manual)
+[INFO] 7.10 Ensure that management plane traffic is separated from data plane traffic (Manual)
+
+== Remediations ==
+1.1.1 For new installations, you should create a separate partition for the /var/lib/docker mount point.
+For systems which have already been installed, 
+you should use the Logical Volume Manager (LVM)
+within Linux to create a new partition.
+
+1.1.2 You should remove any untrusted users from the docker group. 
+Additionally, you should not create a mapping of sensitive directories from the host to container volumes."
+
+1.1.3 /bin/sh: 1: auditctl: not found
+
+1.1.4 /bin/sh: 1: auditctl: not found
+
+1.1.5 /bin/sh: 1: auditctl: not found
+
+1.1.6 /bin/sh: 1: auditctl: not found
+
+1.1.7 /bin/sh: 3: auditctl: not found
+
+1.1.8 If the file exists, you should add a rule for it. 
+For example: 
+Add the line below to the /etc/audit/audit.rules file:
+-w /run/containerd/containerd.sock -k docker
+Then restart the audit daemon. 
+For example:
+systemctl restart auditd
+
+1.1.9 If the file exists, you should add a rule for it. 
+For example: 
+Add the line below to the /etc/audit/audit.rules file:
+-w /var/run/docker.sock -k docker
+Then restart the audit daemon. 
+For example:
+systemctl restart auditd
+
+1.1.10 /bin/sh: 1: auditctl: not found
+
+1.1.11 /bin/sh: 1: auditctl: not found
+
+1.1.12 /bin/sh: 1: auditctl: not found
+
+1.1.13 /bin/sh: 1: auditctl: not found
+
+1.1.14 /bin/sh: 1: auditctl: not found
+
+1.1.15 /bin/sh: 1: auditctl: not found
+
+1.1.16 /bin/sh: 1: auditctl: not found
+
+1.1.17 /bin/sh: 1: auditctl: not found
+
+1.1.18 /bin/sh: 1: auditctl: not found
+
+1.2.1 You may consider various CIS Security Benchmarks for your container host. 
+If you have other security guidelines or regulatory requirements 
+to adhere to, please follow them as suitable in your environment. 
+
+1.2.2 You should monitor versions of Docker releases and make sure
+your software is updated as required.
+
+2.1 Follow the current Docker documentation on how to install the Docker daemon as a non-root user.
+
+2.5 You should ensure that no insecure registries are in use.
+
+2.7 Follow the steps mentioned in the Docker documentation or other references.
+
+2.8 Run the docker in daemon mode and pass --default-ulimit as argument with respective
+ulimits as appropriate in your environment.
+For Example,
+dockerd --default-ulimit nproc=1024:2048 --default-ulimit nofile=100:200
+
+2.9 panic: reflect: indirection through nil pointer to embedded struct [recovered]
+	panic: reflect: indirection through nil pointer to embedded struct
+
+goroutine 1 [running]:
+text/template.errRecover(0xc00061f2e8)
+	/usr/local/go/src/text/template/exec.go:169 +0x1c5
+panic(0x55f5e99b1ec0, 0x55f5e9cab308)
+	/usr/local/go/src/runtime/panic.go:965 +0x1b9
+reflect.Value.FieldByIndex(0x55f5e9b492e0, 0xc00004f940, 0x99, 0xc000131130, 0x2, 0x2, 0x0, 0x55f5e9d3a1a8, 0x55f5e9978b20)
+	/usr/local/go/src/reflect/value.go:889 +0x325
+text/template.(*state).evalField(0xc00061f258, 0x55f5e9b492e0, 0xc00004f940, 0x99, 0x7ffe2441e3c5, 0xf, 0x55f5e9d23d60, 0xc0001dc810, 0xc00014d5c0, 0x1, ...)
+	/usr/local/go/src/text/template/exec.go:616 +0x4ed
+text/template.(*state).evalFieldChain(0xc00061f258, 0x55f5e9b492e0, 0xc00004f940, 0x99, 0x55f5e9b492e0, 0xc00004f940, 0x99, 0x55f5e9d23d60, 0xc0001dc810, 0xc00014d5b0, ...)
+	/usr/local/go/src/text/template/exec.go:569 +0x225
+text/template.(*state).evalFieldNode(0xc00061f258, 0x55f5e9b492e0, 0xc00004f940, 0x99, 0xc0001dc810, 0xc00014d5c0, 0x1, 0x1, 0x55f5e9a3ff60, 0x55f5eaabe9d0, ...)
+	/usr/local/go/src/text/template/exec.go:533 +0x115
+text/template.(*state).evalCommand(0xc00061f258, 0x55f5e9b492e0, 0xc00004f940, 0x99, 0xc0001dc7e0, 0x55f5e9a3ff60, 0x55f5eaabe9d0, 0x99, 0xd0, 0xc0001cd450, ...)
+	/usr/local/go/src/text/template/exec.go:461 +0x8f0
+text/template.(*state).evalPipeline(0xc00061f258, 0x55f5e9b492e0, 0xc00004f940, 0x99, 0xc0001c7560, 0x55f5e86427d6, 0xc0001e8058, 0xc00004f900)
+	/usr/local/go/src/text/template/exec.go:435 +0x125
+text/template.(*state).walk(0xc00061f258, 0x55f5e9b492e0, 0xc00004f940, 0x99, 0x55f5e9d23b68, 0xc0001dc840)
+	/usr/local/go/src/text/template/exec.go:254 +0x38a
+text/template.(*state).walk(0xc00061f258, 0x55f5e9b492e0, 0xc00004f940, 0x99, 0x55f5e9d23e38, 0xc0001dc7b0)
+	/usr/local/go/src/text/template/exec.go:263 +0x13c
+text/template.(*Template).execute(0xc00004f900, 0x55f5e9cca858, 0xc000331aa0, 0x55f5e9b492e0, 0xc00004f940, 0x0, 0x0)
+	/usr/local/go/src/text/template/exec.go:217 +0x1c6
+text/template.(*Template).Execute(...)
+	/usr/local/go/src/text/template/exec.go:200
+github.com/docker/cli/cli/command/system.formatInfo(0x55f5e9d36fa8, 0xc00052f040, 0x0, 0xc00014d3f0, 0x1, 0x1, 0xc0002c1ea0, 0x0, 0x0, 0x0, ...)
+	/go/src/github.com/docker/cli/cli/command/system/info.go:511 +0x1fd
+github.com/docker/cli/cli/command/system.runInfo(0xc0001acb00, 0x55f5e9d36fa8, 0xc00052f040, 0xc00014cc10, 0x0, 0x0)
+	/go/src/github.com/docker/cli/cli/command/system/info.go:88 +0x3a5
+github.com/docker/cli/cli/command/system.NewInfoCommand.func1(0xc0001acb00, 0xc00007d680, 0x0, 0x2, 0x0, 0x0)
+	/go/src/github.com/docker/cli/cli/command/system/info.go:54 +0x48
+github.com/docker/cli/vendor/github.com/spf13/cobra.(*Command).execute(0xc0001acb00, 0xc0001b54b0, 0x2, 0x2, 0xc0001acb00, 0xc0001b54b0)
+	/go/src/github.com/docker/cli/vendor/github.com/spf13/cobra/command.go:850 +0x472
+github.com/docker/cli/vendor/github.com/spf13/cobra.(*Command).ExecuteC(0xc0000e42c0, 0xc0001b54a0, 0x3, 0x3)
+	/go/src/github.com/docker/cli/vendor/github.com/spf13/cobra/command.go:958 +0x375
+github.com/docker/cli/vendor/github.com/spf13/cobra.(*Command).Execute(...)
+	/go/src/github.com/docker/cli/vendor/github.com/spf13/cobra/command.go:895
+main.runDocker(0xc00052f040, 0x55f5e9cccdf8, 0xc000010028)
+	/go/src/github.com/docker/cli/cmd/docker/docker.go:287 +0x1eb
+main.main()
+	/go/src/github.com/docker/cli/cmd/docker/docker.go:298 +0xfc
+
+2.17 By default, Docker's default seccomp profile is applied. If this is adequate for your 
+environment, no action is necessary. Alternatively, if you choose to apply your own 
+seccomp profile, use the --seccomp-profile flag at daemon start or put it in the daemon 
+runtime parameters file.
+dockerd --seccomp-profile </path/to/seccomp/profile>
+
+2.18 experimental=
+Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/version": dial unix /var/run/docker.sock: connect: permission denied
+
+3.7 stat: cannot statx '/etc/docker/certs.d/*': No such file or directory
+
+3.8 stat: cannot statx '/etc/docker/certs.d/*': No such file or directory
+
+3.9 You should execute the following command:
+chown root:root <path to TLS CA certificate file>
+This sets the individual ownership and group ownership for the TLS CA certificate file to root.
+
+3.10 You should execute the following command: chmod 444 <path to TLS CA certificate file>
+chmod 444 <path to TLS CA certificate file>
+This sets the file permissions on the TLS CA file to 444.
+
+3.11 You should run the following command:
+chown root:root <path to Docker server certificate file>
+This sets the individual ownership and the group ownership for the Docker server
+certificate file to root.
+
+3.12 You should execute the command below:
+chmod 444 <path to Docker server certificate file>
+This sets the file permissions of the Docker server certificate file to 444 .
+
+3.13 You should execute the following command:
+chown root:root <path to Docker server certificate key file>
+This sets the individual ownership and group ownership for the Docker server certificate
+key file to root.
+
+3.14 You should execute the following command:
+chmod 400 <path to Docker server certificate key file>
+This sets the Docker server certificate key file permissions to 400 .
+
+3.18 You should execute the command below
+chmod 644 /etc/docker/daemon.json
+This sets the file permissions for this file to 644.
+
+3.20 stat: cannot statx '/etc/sysconfig/docker': No such file or directory
+
+3.21 stat: cannot statx '/etc/sysconfig/docker': No such file or directory
+
+3.24 You should execute the following command:
+chmod 660 /run/containerd/containerd.sock
+This sets the file permissions for this file to 660.
+
+4.1 You should ensure that the Dockerfile for each container image contains the information below:
+USER <username or ID>
+In this case, the user name or ID refers to the user that was found in the container base
+image. If there is no specific user created in the container base image, then make use of the
+useradd command to add a specific user before the USER instruction in the Dockerfile.
+For example, add the below lines in the Dockerfile to create a user in the container:
+RUN useradd -d /home/username -m -s /bin/bash username
+USER username
+Note: If there are users in the image that are not needed, you should consider deleting
+them. After deleting those users, commit the image and then generate new instances of the
+containers.
+Alternatively, if it is not possible to set the USER directive in the Dockerfile, a script running
+as part of the CMD or ENTRYPOINT sections of the Dockerfile should be used to ensure that
+the container process switches to a non-root user.
+
+4.2 The following procedures are useful for establishing trust for a specific image.
+- Configure and use Docker Content trust.
+- View the history of each Docker image to evaluate its risk, dependent on the
+  sensitivity of the application you wish to deploy using it.
+- Scan Docker images for vulnerabilities at regular intervals.
+
+4.3 You should not install anything within the container that is not required.
+You should consider using a minimal base image rather than the standard
+Redhat/Centos/Debian images if you can. Some of the options available include BusyBox
+and Alpine.
+Not only can this trim your image size considerably, but there would also be fewer pieces of
+software which could contain vectors for attack.
+
+4.4 Images should be re-built ensuring that the latest version of the base images are used, to
+keep the operating system patch level at an appropriate level. Once the images have been
+re-built, containers should be re-started making use of the updated images.
+
+4.5 To enable content trust in a bash shell, enter the following command:
+export DOCKER_CONTENT_TRUST=1
+Alternatively, you could set this environment variable in your profile file so that content 
+trust in enabled on every login.
+
+4.6 You should follow the Docker documentation and rebuild your container images to include
+the HEALTHCHECK instruction.
+
+4.7 You should use update instructions together with install instructions and version pinning
+for packages while installing them. This prevent caching and force the extraction of the
+required versions.
+Alternatively, you could use the --no-cache flag during the docker build process to avoid
+using cached layers.
+
+4.8 You should allow setuid and setgid permissions only on executables which require them.
+You could remove these permissions at build time by adding the following command in
+your Dockerfile, preferably towards the end of the Dockerfile:
+RUN find / -perm /6000 -type f -exec chmod a-s {} \; || true
+
+4.9 You should use COPY rather than ADD instructions in Dockerfiles.
+
+4.10 Do not store any kind of secrets within Dockerfiles. Where secrets are required during the 
+build process, make use of a secrets management tool, such as the buildkit builder included 
+with Docker.
+
+4.11 You should use a secure package distribution mechanism of your choice to ensure the 
+authenticity of software packages.
+
+5.1 If AppArmor is applicable for your Linux OS, you should enable it.
+      1. Verify if AppArmor is installed. If not, install it.
+      2. Create or import a AppArmor profile for Docker containers.
+      3. Put this profile in enforcing mode.
+      4. Start your Docker container using the customized AppArmor profile. For example,
+docker run --interactive --tty --security-opt="apparmor:PROFILENAME" centos
+/bin/bash
+Alternatively, Docker's default AppArmor policy can be used.
+
+5.2 If SELinux is applicable for your Linux OS, you should use it.
+        1. Set the SELinux State.
+        2. Set the SELinux Policy.
+        3. Create or import a SELinux policy template for Docker containers.
+        4. Start Docker in daemon mode with SELinux enabled. For example,
+  docker daemon --selinux-enabled
+        5. Start your Docker container using the security options. For example,
+  docker run --interactive --tty --security-opt label=level:TopSecret centos
+  /bin/bash
+
+5.3 You should execute the command below to add required capabilities:
+docker run --cap-add={"Capability 1","Capability 2"} <Run arguments>
+<Container Image Name or ID> <Command>
+You should execute the command below to remove unneeded capabilities:
+docker run --cap-drop={"Capability 1","Capability 2"} <Run arguments>
+<Container Image Name or ID> <Command>
+Alternatively, you could remove all the currently configured capabilities and then restore
+only the ones you specifically use:
+docker run --cap-drop=all --cap-add={"Capability 1","Capability 2"} <Run
+arguments> <Container Image Name or ID> <Command>
+
+5.6 Uninstall the SSH daemon from the container and use and use docker exec to enter a
+container on the remote host.
+docker exec --interactive --tty $INSTANCE_ID sh
+OR
+docker attach $INSTANCE_ID
+
+5.7 You should not map container ports to privileged host ports when starting a container. You
+should also, ensure that there is no such container to host privileged port mapping
+declarations in the Dockerfile.
+
+5.8 You should ensure that the Dockerfile for each container image only exposes needed ports. 
+You can also completely ignore the list of ports defined in the Dockerfile by NOT using -P 
+(UPPERCASE) or the --publish-all flag when starting the container. Instead, use the -p 
+(lowercase) or --publish flag to explicitly define the ports that you need for a particular
+container instance.
+For example,
+docker run --interactive --tty --publish 5000 --publish 5001 --publish 5002
+centos /bin/bash
+
+5.10 Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/containers/json?all=1": dial unix /var/run/docker.sock: connect: permission denied
+"docker inspect" requires at least 1 argument.
+See 'docker inspect --help'.
+
+Usage:  docker inspect [OPTIONS] NAME|ID [NAME|ID...]
+
+Return low-level information on Docker objects
+
+5.11 Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/containers/json?all=1": dial unix /var/run/docker.sock: connect: permission denied
+"docker inspect" requires at least 1 argument.
+See 'docker inspect --help'.
+
+Usage:  docker inspect [OPTIONS] NAME|ID [NAME|ID...]
+
+Return low-level information on Docker objects
+
+5.14 Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/containers/json?all=1": dial unix /var/run/docker.sock: connect: permission denied
+"docker inspect" requires at least 1 argument.
+See 'docker inspect --help'.
+
+Usage:  docker inspect [OPTIONS] NAME|ID [NAME|ID...]
+
+Return low-level information on Docker objects
+
+5.17 You should not directly expose host devices to containers. If you do need to expose host
+devices to containers, you should use granular permissions as appropriate to your
+devices to containers, you should use granular permissions as appropriate to your
+For example, do not start a container using the command below:
+docker run --interactive --tty --device=/dev/tty0:/dev/tty0:rwm --
+device=/dev/temp_sda:/dev/temp_sda:rwm centos bash
+You should only share the host device using appropriate permissions:
+docker run --interactive --tty --device=/dev/tty0:/dev/tty0:rw --
+device=/dev/temp_sda:/dev/temp_sda:r centos bash
+
+5.18 You should only override the default ulimit settings if needed in a specific case.
+For example, to override default ulimit settings start a container as below:
+docker run --ulimit nofile=1024:1024 --interactive --tty centos /bin/bash
+
+5.19 Do not mount volumes in shared mode propagation.
+For example, do not start container as below:
+docker run <Run arguments> --volume=/hostPath:/containerPath:shared
+<Container Image Name or ID> <Command>
+
+5.23 /bin/sh: 1: ausearch: not found
+
+5.24 You should not use the --cgroup-parent option within the docker run command unless 
+strictly required.
+
+5.25 Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/containers/json?all=1": dial unix /var/run/docker.sock: connect: permission denied
+"docker inspect" requires at least 1 argument.
+See 'docker inspect --help'.
+
+Usage:  docker inspect [OPTIONS] NAME|ID [NAME|ID...]
+
+Return low-level information on Docker objects
+
+5.26 You should run the container using the --health-cmd parameter.
+For example,
+docker run -d --health-cmd='stat /etc/passwd || exit 1' nginx
+
+5.27 You should use proper version pinning mechanisms (the "latest" tag which is assigned by
+default is still vulnerable to caching attacks) to avoid extracting cached older versions.
+Version pinning mechanisms should be used for base images, packages, and entire images.
+You can customize version pinning rules according to your requirements.
+
+5.28 Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/containers/json?all=1": dial unix /var/run/docker.sock: connect: permission denied
+"docker inspect" requires at least 1 argument.
+See 'docker inspect --help'.
+
+Usage:  docker inspect [OPTIONS] NAME|ID [NAME|ID...]
+
+Return low-level information on Docker objects
+
+5.31 Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/containers/json?all=1": dial unix /var/run/docker.sock: connect: permission denied
+"docker inspect" requires at least 1 argument.
+See 'docker inspect --help'.
+
+Usage:  docker inspect [OPTIONS] NAME|ID [NAME|ID...]
+
+Return low-level information on Docker objects
+
+6.1 You should keep only the images that you actually need and establish a workflow to
+remove old or stale images from the host. Additionally, you should use features such as
+pull-by-digest to get specific images from the registry.
+You can follow the steps below to find unused images on the system so they can be deleted.
+Step 1 Make a list of all image IDs that are currently instantiated by executing the
+command below:
+docker images --quiet | xargs docker inspect --format '{{ .Id }}: Image={{
+        .Config.Image }}'
+Step 2: List all the images present on the system by executing the command below:
+docker images
+Step 3: Compare the list of image IDs from Step 1 and Step 2 and look for images that are
+currently not in use. If any unused or old images are found, discuss with the system
+administrator the need to keep such images on the system. If images are no longer needed
+they should be deleted.
+
+6.2 You should periodically check your container inventory on each host and clean up
+containers which are not in active use with the command below:
+docker container prune
+
+7.1 Test marked as skip
+7.2 Test marked as skip
+7.3 Test marked as skip
+7.4 Test marked as skip
+7.5 Test marked as skip
+7.6 Test marked as skip
+7.7 Test marked as skip
+7.8 Test marked as skip
+7.9 Test marked as skip
+7.10 Test marked as skip
+
+== Summary ==
+35 checks PASS
+34 checks FAIL
+37 checks WARN
+10 checks INFO
