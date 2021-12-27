@@ -1,0 +1,22 @@
+1. Incident commander name:
+    Harinious
+
+2. Executive Summary of what happened:
+    - Three pods running different crypto miners were identified running moneropool, minergate and cryptonight containers.
+    - An attacker was able to get control of the cluster and use compute resources to abuse for crypto-mining.
+    - The Falco monitoring runtime reports the incident and the administrator was able to visualize the suspicious activity in Grafana.
+
+3. Summary of what was affected:
+    CPU resources had a significant spike indicating that attackers made use of compute resources.
+
+4. Summary of the impact:
+    Monitoring reports CPU utilization spikes.
+
+5. Summary of the remediation steps:
+    - Kill pods kubectl --kubeconfig kube_config_cluster.yml delete pod <pod_name> --grace-period=0 --force
+    - Verify CPU activity stabilization
+
+6. Summary of lessons learned:
+    - We should review access to the Kubernetes API server from administrative terminals and the Grafana dashboards.
+    - Admission controllers can also be configured to disallow unknown images to be used to create containers.
+    - We can update the priority of Falco rules for the metrics endpoint to the highest level.
