@@ -80,3 +80,29 @@ Where:
 4. Install Docker >= 18.09 using the instructions provided in the [Official Docker Documentation](https://docs.docker.com/get-docker/)
 5. Install Vagrant >= 2.2.14 using the instructions provided in the [Official Vagrant Documentation](https://www.vagrantup.com/downloads)
 6. Install VirtualBox >= 6.1 using the instructions provided in the [Official VirtualBox Documentation](https://www.virtualbox.org/wiki/Downloads)
+
+# Project Steps
+
+## Step 1: Threat Model the Microservices Environment
+- In this first step, we will apply what we learned about STRIDE threat modeling in the lessons to document and threat model your microservices environment. We will define a security architecture for our environment and identify attack surfaces. The environment consists of the following:
+   - Single OpenSUSE Linux virtual machine (host)
+   - An RKE cluster deploy to the Linux virtual machine node cluster (cluster)
+   - The cluster runs a vulnerable python application (service)
+   - Docker is running on the host node to manage containers (container daemon)
+- Our goal is to think like an attacker and reason about security weaknesses that could be attacked. The intent is to mimic what we should do in the real world, whereby we should perform threat modeling and a security architecture review at the onset of your microservices project.
+
+## Instructions:
+- Using [lucid chart free version](https://lucid.app/documents#/dashboard) or [Google docs](https://www.google.com/docs/about/), create a diagram of the environment we are about to implement.
+  - Our diagram should minimally abstract the openSUSE host, RKE cluster, Python service, and Docker container daemon we will deploy.
+  - We should identify service and security boundaries with lines and data flow with arrows. 
+  - Save the file as `security_architecture_design.png` in the `/submissions` directory of the project repo.
+- Using the STRIDE threat modeling methodology and the `threat_modeling_template.txt` in the `/starter/threat_modeling` directory of the project repo, document 5 concrete attack surface areas for the Docker environment and 5 concrete attack surface areas for the Kubernetes control plane, etcd, and worker.
+  - In our explanation, associate each attack surface area to at least one pillar of the STRIDE model, which includes Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, and Elevation of Privilege. There can be multiple attack surface areas associated with one pillar, but the attack surface areas have to be distinct.
+  - Save the `threat_modeling_template.txt` document in the `/submissions` directory of the project repo.
+  - We can reference the following documents if you need a reminder of the attack surfaces:
+     - [CIS_Docker_Benchmark_v1.2.0.pdf](https://github.com/udacity/nd064-c3-microservices-security-project-starter/blob/master/starter/docs/CIS_Docker_Benchmark_v1.2.0.pdf) (provided courtesy of the Center for Internet Security)
+     - [Rancher_Benchmark_Assessment.pdf](https://github.com/udacity/nd064-c3-microservices-security-project-starter/blob/master/starter/docs/Rancher_Benchmark_Assessment.pdf)
+     - [Rancher Hardening Guide with CIS 1.6 Benchmark](https://rancher.com/docs/rancher/v2.x/en/security/rancher-2.5/1.6-hardening-2.5/)
+
+### Note
+Think like an attacker and reason from there.
