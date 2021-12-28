@@ -106,3 +106,74 @@ Where:
 
 ### Note
 Think like an attacker and reason from there.
+
+## Step 2: Harden the Microservices Environment
+- Here we will focus on hardening the Docker environment by using Docker-bench. Once the hardened container image is committed to a provider registry, we will use it to create an RKE cluster. We will then harden the RKE cluster. By the end of this step, we should have a hardened Docker host running on a hardened RKE cluster.
+
+### 2.1: Docker-Bench Installation
+- Follow the below steps to complete the Docker-Bench installation
+```
+1. go env //Instaling go is one of the important steps for installing docker-bench
+2. sudo docker pull opensuse/leap:latest 
+3. sudo docker images | grep opensuse
+4. sudo docker build . -t opensuse/leap:latest -m 256mb --no-cache=true 
+5. sudo docker image ls
+6. sudo docker run opensuse/leap
+7. git clone https://github.com/udacity/nd064-c3-microservices-security-project-starter.git
+8. git clone https://github.com/anxolerd/dvpwa.git
+9. git clone https://github.com/aquasecurity/docker-bench.git
+```
+The Docker-Bench is now successfully installed.
+
+### 2.2: Create a Hardened Docker Environment
+### Identify weaknesses
+- Using the starter `Dockerfile` in the starter repo and an openSUSE base image, create a hardened Docker environment with Docker-bench.
+- Run Docker-bench for the first time. Take screenshots of the result summary and all failed findings, and name the screenshots as `suse_docker_environment_out_of_box.png`` or something similar in the `/submissions` directory of the project repo.
+- Using the `CIS_Docker_Benchmark_v1.2.0.pdf` from the starter repo, review the findings from running the docker-bench.
+- From the failed findings, select and document 3 failed findings from the Docker-bench results that we want to harden. These 3 findings should confirm 3 out of the 5 attack surface areas we identified for Docker in Step 1. At least 1 of the 3 findings should be different from the ones mentioned in the exercise 
+- Document each of the 3 findings we want to harden to the existing threat_modeling_template.txt file and save the file in the `/submissions` directory of the project repo.
+
+### 2.3: Hardening using Docker-Bench
+- Follow the below steps to harden the environment.
+```
+1. cd  /docker-bench  
+2. go build -o docker-bench 
+3. ./docker-bench --include-test-output > docker-bench.txt --version 20.10.11
+4. cat docker-bench.txt | grep FAIL
+```
+- From the failed findings, let's select 2.14,2.15,2.16 & 3.17 fails and harden them.
+- Follow the below steps to harden the above fails 
+```
+#Procedure 1
+create `daemon.json file` in /etc/docker/ path and add the below lines
+{
+ "live-restore": true
+ "no-new-privileges": true
+ "userland-proxy": false
+ "disable-legacy-registry": true
+}
+```
+```
+#Procedure 2
+Execute the below commands one by one
+1. sudo dockerd --live-restore
+2. sudo dockerd --no-new-privileges
+3. sudo dockerd --userland-proxy=false
+4. sudo dockerd --disable-legacy-registry
+```
+- If we re-run the docker-bench tool, we will not see the fails and thus the environment is hardened using Docker-Bench tool.
+
+### Before Hardening the Environment
+
+![1.Suse_docker_environment_out_of_box](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Hardened%20Microservices%20Environment/submissions/1.Suse_docker_environment_out_of_box.PNG)
+
+### After Hardening the Environment
+
+![2.Suse_docker_environment_hardened](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Hardened%20Microservices%20Environment/submissions/2.Suse_docker_environment_hardened.PNG)
+
+### Note:
+The docker services can be checked and started using the below commands
+```
+1. service docker status
+2. service docker start 
+```
