@@ -31,3 +31,52 @@ write an incident response report and present it to the CTO. There will be a few
 5. Implement Falco and Grafana for run-time monitoring.
 6. Run a script to introduce an unknown payload intentionally.
 7. Identify the unknown binary and take steps to remediate it.
+
+# Getting Started
+- The starter files for the project can be found in the [project repository](https://github.com/udacity/nd064-c3-Microservices-Security-project-starter/tree/master/)
+- The /starter directory contains everything except the vuln_app which is the root.
+
+![Directory](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Hardened%20Microservices%20Environment/image/Directory.PNG)
+
+Where:
+
+- `Dockerfile` to provision a container image using an OpenSUSE image.
+- `LICENSE` is a license for the course content.
+- `Vagrantfile` to configure a Vagrant box. It will be used to create a Vagrant box locally.
+- `cluster.yml` to provision a Rancher RKE 1-node cluster.
+- `reference_hardened_cluster.yml` is a reference hardened cluster.yml to guide you. You cannot use the reference_hardened_cluster.yml file as-is to startup the cluster.
+docs contains reference PDFs.
+- `incident_response` directory contains a incident_response.txttemplate responding to an incident. You will use it later ;)
+- `scripts directory` contains a payload.sh that will be used later in the project. Keep an eye on it!
+- `security_architecture` directory contains example security architecture diagrams.
+- `threat_modeling` directory contains a threat_modeling_template.txt template for STRIDE threat modeling.
+
+- The `vuln_app` is contained in the repo root as a submodule linked from the [source repo](https://github.com/anxolerd/dvpwa):
+
+![Folder_Structure](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Hardened%20Microservices%20Environment/image/Folder_Structure.PNG)
+
+Where:
+
+- `Dockerfile.app` defines that this is a dockerized application.
+- `Dockerfile.db` indicates that there is a Dockerized database.
+- `LICENSE` defines a license from the developer of dvpwa.
+- `README.rst` contains an application startup readme.
+- `config` contains configurations to startup the application.
+- `docker-compose.yml`: Run this to bring up the application.
+- `migrations` folder contains migration scripts.
+- `recreate.sh` allows us to recreate the database.
+- `requirements.txt` file defines all the libraries required to run this application.
+- `run.py` the primary Python app startup directory.
+- `sqli` is the configuration directory for the SQLite database that's run as part of the application.
+
+- To run this vuln_app follow these steps:
+1. Run the Flask program by using the docker-compose up command.
+2. The application should be running on port 8000. You can access it by querying the http://localhost:8080endpoint.
+
+## Dependencies
+1. Clone the project code from [course repo](https://github.com/udacity/nd064-c3-microservices-security-project-starter)
+2. Install Python >= 3.0 using the instructions provided in the [Official Python Documentation](https://www.python.org/downloads/)
+3. Install Git >= 2.27.o using the instructions provided in the [Official Git Documentation](https://git-scm.com/downloads)
+4. Install Docker >= 18.09 using the instructions provided in the [Official Docker Documentation](https://docs.docker.com/get-docker/)
+5. Install Vagrant >= 2.2.14 using the instructions provided in the [Official Vagrant Documentation](https://www.vagrantup.com/downloads)
+6. Install VirtualBox >= 6.1 using the instructions provided in the [Official VirtualBox Documentation](https://www.virtualbox.org/wiki/Downloads)
