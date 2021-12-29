@@ -161,7 +161,10 @@ Execute the below commands one by one
 3. sudo dockerd --userland-proxy=false
 4. sudo dockerd --disable-legacy-registry
 ```
-- If we re-run the docker-bench tool, we will not see the fails and thus the environment is hardened using Docker-Bench tool.
+## 2.4: Harden Weaknesses
+- Harden the three Docker weaknesses we identified.
+- We may need to reference the CIS_Docker_Benchmark_v1.2.0.pdf and [Docker security documentation.](https://docs.docker.com/engine/security/) If we get stuck and can’t figure out how to make the change, either pick a different attack surface to harden or try to get help through online research.
+- Re-run Docker-bench to verify that the weaknesses we hardened have been addressed. Take screenshots of the result summary and all failed findings, and name the screenshots as `suse_docker_environment_hardened.png` or something similar in the `/submissions` directory of the project repo.
 
 ### Before Hardening the Environment
 
@@ -177,3 +180,82 @@ The docker services can be checked and started using the below commands
 1. service docker status
 2. service docker start 
 ```
+### Tip
+- Depending our prior knowledge, we may or may not see a direct connection between the hypothesis in our threat model and the actual failed findings. This is common in the industry.
+- One threat that we hypothesized in our threat model may be reflected by and related to multiple failed findings.
+- In the real world, it is almost impossible or impractical to resolve and remediate all the weaknesses that are threat-modeled and reflected in the failed findings.
+- There is not necessarily a right or wrong answer as long as we explain the reasoning using STRIDE.
+
+## 2.5: Create a Hardened Kubernetes Environment
+1. Deploy an RKE cluster using the Vagrantfile.
+2. Run Kube-bench for the first time. Take screenshots of the result summary and all failed findings, and name the screenshots as `kube_cluster_out_of_box.png` or something similar in the `/submissions` directory of the project repo.
+3. Apply baseline hardening steps to the cluster.
+4. Re-run Kube-bench to verify the cluster has been hardened via baseline hardening. Take screenshots of the result summary and all failed findings, and name the screenshots as `kube_cluster_hardened.png` or something similar in the `/submissions` directory of the project repo.
+
+## 2.6: Kubernetes-specific test plan
+- The most important aspect of hardening is making sure the hardening does not negatively affect system stability. The last thing we want is for our hardening to lead to an outage of the cluster.
+- Write at least 200 words describing a Kubernetes-specific test plan based on what we learned from the course. The test plan does not need to address specific hardening steps. - Answer these two questions in test plan:
+  - How will we test the changes?
+  - How will we ensure the changes don't negatively affect our cluster?
+- Save the test plan as `kube_hardening_test_plan.txt` in the `/submissions` directory of the project repo.
+
+## 2.7: Setting up and Bringing up the RKE Cluster
+### Overview
+- In this step, we will set up the RKE cluster. We will bring up a 2-node cluster. The first node is a `control plane and etcd node`. The second node is a `worker`.
+- The first node has two roles:
+   - Control plane: With this role, the stateless components are used to deploy Kubernetes will run on these nodes. These components are used to run the API server, scheduler, and controller roles that are often separate roles in mainline Kubernetes. In RKE these have been packaged into the control plane role with RKE.
+  - Etcd: With this role, the etcd container will be run on these nodes. Etcd keeps the state of your cluster and is one of the most important components and a single source of truth for your cluster.
+- The second node is intentionally a simple worker:
+  - With this role, any workloads or pods that are deployed will land on this node.
+- For more details on the nodes, consult [Rancher's documentation on nodes](https://rancher.com/docs/rke/latest/en/config-options/nodes/)
+
+## 2.7.1: RKE Cluster Setup Prerequisites:
+- We need to download the RKE binary and add it to our home path directory in order to bring up the cluster. Below we will find the instructions on how to download and check the RKE binary.
+   - Make sure you have [Vagrant](https://www.vagrantup.com/downloads) or higher installed
+   - Make sure you have [VirtualBox](https://www.virtualbox.org/wiki/Downloads) installed
+   - Install the [RKE binary](https://rancher.com/docs/rke/latest/en/installation/)
+
+### Note:
+- This section is very important! Follow the steps very closely. Otherwise, we won't be able to bring up the RKE cluster.
+- It's very important that we download the correct RKE binary for your system from this [page](https://github.com/rancher/rke/releases) and for this project used this [binary](https://github.com/rancher/rke/releases/download/v1.3.3/rke_linux-amd64)
+- Check our path via `echo $PATH` and pick one path directory to move the binary into, e.g. /usr/local/bin /usr/bin
+- Rename and move the binary into our chosen path via `mv rke_linux-amd64 /usr/local/bin/rke`. This assumes the downloaded `rke_linux-amd64 binary` is in the current directory.
+- The binary must be renamed rke (lowercase) precisely. We will not be able to call the binary if the name is not rke.
+- Mac and Linux: Make sure the binary is executable via $ chmod +x rke
+- Windows: The file is already executable.
+- Confirm that RKE is now executable by running the following command: rke --version. If it does not return something similar to rke version v1.2.6, we don't have RKE defined correctly in our $PATH. Go back and review the instructions.
+- On macOS, the RKE binary may not be trusted when running for the first time. We need to go to "Security and Privacy Settings" and confirm "Allow Anyway". We will be hard blocked unless we verify and allow the binary.
+- Finish the setup by installing kubectl and cloning the exercise starter repo.
+  - Make sure you have [kubectl binary](https://kubernetes.io/docs/tasks/tools/#kubectl) installed
+  - Clone the starter repo and cd to the `starter/` directory
+
+## 2.7.2: Provision an RKE Cluster
+1. Create Vagrant Boxes
+  - On our local machine, cd to the `starter/` folder.
+  - Run vagrant up to create Vagrant boxes.
+  - Keep the Vagrantfile and the `bootstrap.sh` in the same directory.
+  - When bringing up the environment, it's recommended not to use the root user to install Docker and not to have firewall and apparmor enabled. Therefore, the bootstrap.sh         script takes care of the following tasks when we run vagrant up: install Docker, disable firewalld, disable apparmor, set up rke user, and copy auth_keys for rke user.
+  - It will take around 5-20 mins, depending on how performant our host machine is. If our host machine starts to hang, close unnecessary programs. If it still doesn't work, edit the Vagrantfile to reduce the VM memory to 2048 MB. If it still hangs try 1024 MB, this is the lower limit.
+
+2. Check SSH Key Pair
+  - Verify if `~/.ssh/id_rsa`` and ~/.ssh/id_rsa.pub` files exist by running `cat ~/.ssh/id_rsa` and `cat ~/.ssh/id_rsa.pub`
+  - If these are not available, create a new SSH key pair using the following command and press ENTER for each prompt:
+         ```
+         ssh-keygen -t rsa -b 2048
+         ```
+  - This adds a new key pair to our `~/.ssh/id_rsa` and `~/.ssh/id_rsa.pub` file or create a new file if it doesn't exist.
+  - Copy the SSH key for Vagrant box. This allows root access to the boxes without you having to type the password every time. These keys allow RKE to be deployed to the nodes      when we run rke up.
+         ```
+         sudo ssh-copy-id -i ~/.ssh/id_rsa root@192.168.50.101
+         sudo ssh-copy-id -i ~/.ssh/id_rsa root@192.168.50.102
+         ```
+  - Agree to the prompts. The first password is our sudo machine password. The second password is for the key - vagrant. Provide them when prompted.
+
+### Note:
+- Make sure we specify the exact key file (e.g. ~/.ssh/id_rsa) via the -i switch we will use in the copy command. If we do not specify the key file to copy from, we may copy the wrong key and be hard blocked on bringing up the RKE cluster. If we get stuck, troubleshoot as follows:
+  - Run `ls -la ~/.ssh/id_rsa` from your host machine to ensure it shows an accessible SSH key file.
+  - `cat ssh-keygen -y -f ~/.ssh/id_rsa` should output the same exact public key that is installed on the nodes. Check by running `cat ~.ssh/authorized_keys` on each node by ssh'ing locally via `ssh root@192.168.50.101` / `ssh root@192.168.50.102`. Password is vagrant .
+  - The key must match verbatim, no exceptions. If it does not, regenerate the key with the ssh command above and make sure we defined the key file when copying.
+  - We may need to delete our old ssh known hosts. Otherwise, they will conflict with our current known_hosts file when we try to connect to the recreated nodes. We can do so by running `vim /Users/harini/.ssh/known_hosts` and removing the offending lines in vim with dd and :wq to save.
+  - This is the warning you get when there is a conflict in current `known_hosts` file.
+  - If this doesn't work, try to remove the known hosts file via rm -r /Users/harini/.ssh/known_hosts
