@@ -259,3 +259,33 @@ The docker services can be checked and started using the below commands
   - We may need to delete our old ssh known hosts. Otherwise, they will conflict with our current known_hosts file when we try to connect to the recreated nodes. We can do so by running `vim /Users/harini/.ssh/known_hosts` and removing the offending lines in vim with dd and :wq to save.
   - This is the warning you get when there is a conflict in current `known_hosts` file.
   - If this doesn't work, try to remove the known hosts file via rm -r /Users/harini/.ssh/known_hosts
+
+3. [Optional] Make Sure You Can Access Each Node
+  - We can now ssh into each node via
+```
+ssh root@192.168.50.101
+ssh root@192.168.50.102
+```
+4. Create an RKE Cluster
+   - Once the Vagrant boxes are up and running and the root SSH access is configured, we are ready to call the RKE binary to bootstrap the Kubernetes cluster.
+   - The cluster.yml file contains an RKE configuration that will create a 2-node Kubernetes cluster. The first node is a control plane and etcd node. The second node is a worker.
+  - Once we have all these prerequisites in place, use the following command to bootstrap the Kubernetes cluster: `rke up`
+
+### Note for troubleshooting:
+It will take around 10-20 mins to deploy RKE, depending on how performant oour host machine is. If our host machine starts to hang, close unnecessary programs. If it still doesn't work, edit the Vagrantfile to reduce the VM memory to 2048 MB. If it still hangs try 1024 MB, this is the lower limit. If the RKE setup fails, try Step 3 and see if we can ssh into each node without password. If not, try to run rke remove. Also, try the latest RKE release that may have bug fixes. If the cluster doesn't succeed, try to isolate the failing component(s). After running rke remove, scp it from our host to each node and run `./docker-clean.sh`
+
+5.Check RKE Cluster Health
+  - Once the installation is complete, a new kube_config_cluster.yml will be created in our `starter/` directory.We can now check the health of the Kubernetes cluster from our local host using the `kube_config_cluster.yml` kubeconfig file:
+```
+kubectl --kubeconfig kube_config_cluster.yml get nodes
+```
+  - If some of the pods are not running, we could try running rke up again.
+  - If it still does not work, we will likely need to recreate the cluster and troubleshoot cluster creation.
+  - Follow these steps:
+     - Stop our Vagrant box with `vagrant halt node1` and `vagrant halt node2`
+     - Check our Vagrant box status via `vagrant global-status`
+  - Destroy our problematic Vagrant nodes via `vagrant destory <id>`
+  - Recreate the cluster following the provided [instructions](https://rancher.com/docs/rancher/v2.x/en/cluster-admin/cleaning-cluster-nodes/) by Rancher
+  - We may need to delete our old ssh known hosts 
+### Note for troubleshooting:
+- If our RKE cluster does not come up as ready, we may be unable to access the cluster, check the health of the pods that RKE deploys for each of the core services (CNI, DNS, Metrics).
