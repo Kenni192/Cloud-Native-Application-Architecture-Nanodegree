@@ -341,3 +341,27 @@ kube-bench run --targets etcd --scored --config-dir=/etc/kube-bench/cfg --benchm
 We should see that `1.1.12` now passes and we have completed the hardening for etcd.
 
 ![4.Kube_cluster_hardened](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Hardened%20Microservices%20Environment/submissions/4.Kube_cluster_hardened.PNG)
+
+## Step 3: Harden and Deploy the Flask App
+- Here we will focus on hardening and deploying the [Flask app](https://github.com/anxolerd/dvpwa/tree/b11d0415f86cc2285158d2f07c81cd9777d8fffb) by performing software introspection to identify and remediate vulnerable libraries and code.
+  - The application has intentional security flaws in the code that you need to identify and remediate using your knowledge. There are four [documented](https://github.com/anxolerd/dvpwa) vulnerabilities. We will need to minimally remediate the Cross-Site Scripting vulnerability in the code and redeploy the app.
+  - Fix the Cross-Site Scripting vulnerability in the `app.py` file located in `dvpwa/sqli/app.py`. Save the remediated `app.py` file in the `/submissions` directory of the project repo.
+ 
+ The app.py can be found [here](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Hardened%20Microservices%20Environment/submissions/app.py)
+ 
+ ## 3.1: Configure and run Grype
+ - Configure and run [Grype](https://github.com/anchore/grype) to identify vulnerabilities in the libraries and remediate them.
+ - Run a Grype scan in the terminal for the first time. Take a screenshot of all Grype findings and save the screenshot as `grype_app_out_of_box.png` in the `/submissions` directory of the project repo.
+- Research vulnerable libraries on the NVD website and remediate them.
+- Re-run Grype until all vulnerable libraries are remediated. Take a screenshot of the Grype output showing 0 findings and save the screenshot as `grype_app_hardended.png` in the `/submissions` directory of the project repo.
+
+### Note:
+Ensure Grype is installed and configured on our machine.
+```
+brew tap anchore/grype
+brew install grype
+```
+
+![5.grype_app_out_of_box](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Hardened%20Microservices%20Environment/submissions/5.grype_app_out_of_box.PNG)
+
+![6.grype_app_hardened](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Hardened%20Microservices%20Environment/submissions/6.grype_app_hardened.PNG)
