@@ -189,7 +189,7 @@ The docker services can be checked and started using the below commands
 ## 2.5: Create a Hardened Kubernetes Environment
 1. Deploy an RKE cluster using the Vagrantfile.
 2. Run Kube-bench for the first time. Take screenshots of the result summary and all failed findings, and name the screenshots as `kube_cluster_out_of_box.png` or something similar in the `/submissions` directory of the project repo.
-3. Apply baseline hardening steps to the cluster.
+3. Apply [baseline hardening](https://rancher.com/docs/rancher/v2.x/en/security/rancher-2.4/hardening-2.4/) steps to the cluster.
 4. Re-run Kube-bench to verify the cluster has been hardened via baseline hardening. Take screenshots of the result summary and all failed findings, and name the screenshots as `kube_cluster_hardened.png` or something similar in the `/submissions` directory of the project repo.
 
 ## 2.6: Kubernetes-specific test plan
@@ -289,3 +289,55 @@ kubectl --kubeconfig kube_config_cluster.yml get nodes
   - We may need to delete our old ssh known hosts 
 ### Note for troubleshooting:
 - If our RKE cluster does not come up as ready, we may be unable to access the cluster, check the health of the pods that RKE deploys for each of the core services (CNI, DNS, Metrics).
+
+## 2.8: Running Kube-bench to Evaluate Rancher RKE Master Node
+- we will use Kube-bench to evaluate the actual attack surface.
+- Follow the below steps to run kube-bench
+1. SSH into node1 via `root@192.168.50.101`. The password is `vagrant`
+2. Run `zypper in docker` to ensure the latest Docker is installed.
+3. Execute the Docker container on the cluster nodes:
+```
+docker run --pid=host -v /etc:/node/etc:ro -v /var:/node/var:ro -ti rancher/security-scan:v0.2.2 bash
+
+```
+`rancher/security-scan:v0.2.2 bash` is a Docker container that we will start up. This will then run a security scan against this cluster and give us the results. Once you run this command, the context changes (you will be within the container context), and you can see the container id.
+4. Within the container context, run Kube-bench scan against `node1` all components using the `rke-cis-1.6-hardenedbenchmark` profile via
+```
+kube-bench run --targets etcd,master,controlplane,policies --scored --config-dir=/etc/kube-bench/cfg --benchmark rke-cis-1.6-hardened
+```
+For the `--targets`, in Rancher's context, master is part of the controlplane, but we need to separately define it for the Kube-bench targets. There are different benchmark files within the local directory and container. In this case, we are running the benchmark profile rke-cis-1.6-hardened. Once we run this command, we will see 4 sets of failures, one for each of the 4 surfaces.
+5. Filter for failures only and investigate the failures closely
+```
+ kube-bench run --targets etcd,master,controlplane,policies --scored --config-dir=/etc/kube-bench/cfg --benchmark rke-cis-1.6-hardened | grep FAIL
+ ```
+ ![3.Kube_cluster_out_of_box](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Hardened%20Microservices%20Environment/submissions/3.Kube_cluster_out_of_box.PNG)
+ 
+ ## 2.9: Harden Rancher RKE via Baseline Hardening
+- When setting up an RKE cluster that we intend to harden, we have to create an etcd user and etcd group and change the permission of the etcd data directory to etcd:etcd in the configuration steps. These are part of the baseline RKE hardening steps.
+- In the above image on the Running Kube-bench to Evaluate Rancher RKE Master Node, we saw that the check 1.1.12 Ensure that etcd data directory ownership is set to etcd:etcd (scored)fails because we have yet to apply the baseline RKE hardening steps.
+-  we will configure etcd user and group hands-on. Here is [Rancher's documentation](https://rancher.com/docs/rancher/v2.x/en/security/rancher-2.5/1.6-hardening-2.5/#configure-etcd-user-and-group) on how to do so.
+-  The trick is that we will harden the host on which the cluster is running. So we need to create a group called etcd on the host. /var/lib/etcd is the direction that we are going to change the permissions on.
+-  Follow the below steps to harden RKE via baseline hardening
+1. To add the etcd group, we run
+```
+groupadd --gid 52034 etcd
+```
+2. Then to add the etcd group, we run
+```
+useradd --comment "etcd service account" --uid 52034 --gid 52034 etcd
+```
+3. We then change the permission from what it is currently to etcd:etcd by running
+```
+chown etcd:etcd /var/lib/etcd
+```
+4. Re-run the Docker container that runs Rancher's security scan via
+```
+docker run --pid=host -v /etc/passwd:/etc/passwd -v /etc/group:/etc/group -v /etc:/node/etc:ro -v /var:/node/var:ro -ti rancher/security-scan:v0.2.2 bash
+```
+5. Now that the container has started, we re-run the scan on etcd and check if 1.1.12 still fails by running
+```
+kube-bench run --targets etcd --scored --config-dir=/etc/kube-bench/cfg --benchmark rke-cis-1.6-hardened | grep FAIL
+```
+We should see that `1.1.12` now passes and we have completed the hardening for etcd.
+
+![4.Kube_cluster_hardened](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Hardened%20Microservices%20Environment/submissions/4.Kube_cluster_hardened.PNG)
