@@ -274,7 +274,7 @@ ssh root@192.168.50.102
 ### Note for troubleshooting:
 It will take around 10-20 mins to deploy RKE, depending on how performant oour host machine is. If our host machine starts to hang, close unnecessary programs. If it still doesn't work, edit the Vagrantfile to reduce the VM memory to 2048 MB. If it still hangs try 1024 MB, this is the lower limit. If the RKE setup fails, try Step 3 and see if we can ssh into each node without password. If not, try to run rke remove. Also, try the latest RKE release that may have bug fixes. If the cluster doesn't succeed, try to isolate the failing component(s). After running rke remove, scp it from our host to each node and run `./docker-clean.sh`
 
-5.Check RKE Cluster Health
+5. Check RKE Cluster Health
   - Once the installation is complete, a new kube_config_cluster.yml will be created in our `starter/` directory.We can now check the health of the Kubernetes cluster from our local host using the `kube_config_cluster.yml` kubeconfig file:
 ```
 kubectl --kubeconfig kube_config_cluster.yml get nodes
@@ -465,10 +465,114 @@ In this command, we are setting important parameters. falco.grpc.enabled=true an
 
 4. Run `kubectl --kubeconfig kube_config_cluster.yml` get pod to check Falco pod health. If the pod is still being created, the status of the Falco pod will say `ContainerCreating`. After a minute or two, the Falco pod status should change to `Running`
 
+## 4.3: Deploy Prometheus Operator Stack
+We will deploy the Prometheus Operator, which is a piece of software that ingests logs from Falco exporter. To recap, Falco generates security events. Falco exporter consumes and stages those in a format that Prometheus can consume. Then we configure the Prometheus Operator, which includes several different pods to ingest those logs. From there we configure Grafana to visualize and display those logs. Take the following steps to deploy the Prometheus Operator:
+1. Add the corresponding repo:
+```
+helm repo add stable https://charts.helm.sh/stable
+```
+2. Helm install Prometheus Operator:
+```
+helm install --kubeconfig kube_config_cluster.yml stable/prometheus-operator --generate-name
+```
+### Note: 
+We can ignore the deprecation warnings. It should take a couple of minutes for all pods to come up.
+
+3. Once the installation is complete, we will run the following command to check the status of the Prometheus release to make sure the prometheus-operator stack can come up. Remember to add the `--kubeconfig file path` to this command. 
+```
+kubectl --kubeconfig kube_config_cluster.yml --namespace default get pods -l "release=prometheus-operator-1619828194"
+```
+4. Let's also run a get pods command to see how many pods we are running. We can optionally grep for Prometheus-related pods only:
+```
+kubectl --kubeconfig kube_config_cluster.yml --namespace default get pods | grep prometheus
+```
+### Note:
+We should have 6 Prometheus-related pods up. Don't proceed until all are running
+
+5. Next, we port forward our primary Prometheus Operator, the `prometheus-prometheus-operator-[ ]-prometheus-0` pod to port 9090. Insert our unique pod ID. Make sure our pod name ends in -0 and remember to forward it to 9090. Once we run the command, we should have port forwarding started.
+```
+kubectl --kubeconfig kube_config_cluster.yml --namespace default port-forward prometheus-prometheus-operator-[   ]-prometheus-0 9090
+```
+6. Visit `127.0.0.1:9090` from the web browser to check port forwarding and make sure that Prometheus came up. Under "Targets", we should see Prometheus-related service monitors and they are refreshing. These monitor the default Kubernetes services.
+7. If Prometheus doesn't come up as expected, we need to run the following command to kill any existing port forwarding:
+```
+lsof -ti:9090 | xargs kill -9
+```
+## 4.4: Implement Falco-Exporter as a Pod
+we will deploy falco-exporter, which allows us to scrape logs from Falco and stage them in a format that Prometheus can then ingest via a custom scraper configuration. Here are the steps to follow:
+1. Run the following Helm install command to install falco-exporter:
+```
+helm install --kubeconfig kube_config_cluster.yml falco-exporter \
+ --set serviceMonitor.enabled=true \
+falcosecurity/falco-exporter
+```
+### Note: 
+With --set serviceMonitor.enabled=true, we are setting a special switch to install a service monitor, which is a configuration that Prometheus uses to discover falco-exporter, then scrape metrics from it and import them into Prometheus.
+
+2. Run the following command to get the name of the release or the pod name. Remember to add the --kubeconfig file path to this command.
+```
+kubectl --kubeconfig kube_config_cluster.yml get pods --namespace default -l "app.kubernetes.io/name=falco-exporter,app.kubernetes.io/instance=falco-exporter" -o jsonpath="{.items[0].metadata.name}"
+#output: falco-exporter-f4z44
+#Visit http://127.0.0.1:9376/metrics to use our application"
+```
+3. Port forward the pod name above to port `9376` via the following command. Our pod name will include our unique pod ID, instead of `f4z44`:
+```
+kubectl --kubeconfig kube_config_cluster.yml port-forward --namespace default falco-exporter-[   ] 9376
+```
+4. We should now be able to visit `127.0.0.1:9376/metrics` from a web browser locally and see Falco event logs
+
+## 4.5: Create ServiceMonitor File
+We will create and apply a custom `serviceMonitor` file in order for Prometheus to scrape logs from falco-exporter. Here are the steps to follow:
+1. Create a file named `servicemonitor.yaml`. This file can actually be called anything, but let's pick a declarative name.
+```
+touch serviceMonitor.yaml
+```
+2. The file can be found [here](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Building%20a%20Metrics%20Dashboard/manifests/app/serviceMonitor.yaml)
+### Note:
+Looking at this file, we will notice that we are using a Monitoring Core OS API. This file tells Prometheus to apply the ServiceMonitor kind and look for the falco-exportername.
+
+3. Check Prometheus release:
+```
+kubectl --kubeconfig kube_config_cluster.yml get prometheus
+```
+4. Edit the configuration for Prometheus to find the Prometheus release label. Be sure to add the Prometheus name from the output of Step 3.
+```
+kubectl --kubeconfig kube_config_cluster.yml edit prometheus prometheus-operator-161982-prometheus
+```
+### Note:
+The output of Step 4 is lengthy. Look extra carefully for the release label under the matchLabels section. This needs to match the release label in the 
+`serviceMonitor.yaml` file.
+
+5. Modify the release label in the `serviceMonitor.yaml` file accordingly
+6. Apply the updated yaml file via the following command. The `serviceMonitor.yaml` file will be applied to the configuration for the ServiceMonitor. This will then allow Prometheus to discover the falco-exporter pod and scrape logs from it.
+```
+kubectl --kubeconfig kube_config_cluster.yml apply -f serviceMonitor.yaml
+```
+7. Lastly, we need to visit `127.0.0.1:9376/metrics` from the web browser and check the Prometheus pane. Under targets, we need to make sure that the falco-exporter ServiceMonitor has been discovered. We should see 1 active target under "Service Discovery" for `default/falco-exporter-servicemonitor` listed underneath.
+
+## 4.6: Import Falco Grafana Panel and Monitor Metrics
+we will set up the Falco Grafana panel. Specifically, we will port forward Grafana pod, log into Grafana for the first time, configure the Falco Grafana panel to see metrics within Grafana from Falco. Here are the steps to follow:
+1. Run the following command to check the name of the Grafana pod.
+```
+kubectl --kubeconfig kube_config_cluster.yml get pod
+```
+### Note: 
+Take note of the pod containing the Grafana name. This is the pod running Grafana. Our pod name will contain our unique prometheus-operator release tag and an unique string associated with our Grafana pod.
+
+2. Next, we will port forward the Grafana pod on port 3000, which is the port that Grafana uses. Be sure to replace `prometheus-operator-1619828194-grafana-79668b6f49-j964r` with our own Grafana pod name:
+```
+kubectl --kubeconfig kube_config_cluster.yml --namespace default port-forward prometheus-operator-1619828194-grafana-79668b6f49-j964r 3000
+```
+3. Browse `http://127.0.0.1:3000/` from our web browser and login using the following information:
+```
+Username: admin
+Password: prom-operator
+```
+4. From Grafana, click on the `+` icon on the left-hand-side panel, select "Import". We will import the Falco dashboard from the Falco Dashboard page. Copy the panel ID `11914` from this page, apply it to the Grafana Import page and name it. Select the Prometheus data source, which should be automatically discovered.
+5. Ensure Falco metrics are being generated in the Grafana panel. On the top-right corner, select "Last 5 minutes" and refresh. We should be able to see events from Falco.
+
 ## Step 5: Incident Response
 Lastly, we will focus on introducing a suspicious command onto the Kubernetes cluster simulating a security incident. A payload is a script or file that delivers a malicious action such as running malware.
-1. From the [starter repo](https://github.com/udacity/nd064-c3-microservices-security-project-starter/tree/master/starter/scripts), run the `payload.sh` to introduce a suspicious command intentionally.
 
-The `kubectl run` commands in the payload.sh will run containers instantiated from legacy Docker images, such as [servethehome/monero_cpu_moneropool](https://hub.docker.com/r/servethehome/monero_cpu_moneropool), on our cluster. We use these as a canonical example as they are reliable and clearly illustrate falco in action in a controlled learning environment. Those Docker images will run illegitimate crypto mining software and have multiple security issues, such as not using the secure communication channels and not having a software bill of materials used in the image. We have intentionally chosen these Docker images to simulate a controlled security incident. Executing such suspicious workloads in a controlled environment poses a small security risk, particularly if our system is not patched. To be ultra cautious, make sure our host system is patched before we run the crypto demo to reduce the risk. In the real world, patching is a vital practice, always make sure our host systems are patched, and remember that attackers do not ask for permission to attack.
-
+1. From the [starter repo](https://github.com/udacity/nd064-c3-microservices-security-project-starter/tree/master/starter/scripts), run the `payload.sh` to introduce a suspicious command intentionally. The `kubectl run` commands in the payload.sh will run containers instantiated from legacy Docker images, such as [servethehome/monero_cpu_moneropool](https://hub.docker.com/r/servethehome/monero_cpu_moneropool), on our cluster. We use these as a canonical example as they are reliable and clearly illustrate falco in action in a controlled learning environment. Those Docker images will run illegitimate crypto mining software and have multiple security issues, such as not using the secure communication channels and not having a software bill of materials used in the image. We have intentionally chosen these Docker images to simulate a controlled security incident. Executing such suspicious workloads in a controlled environment poses a small security risk, particularly if our system is not patched. To be ultra cautious, make sure our host system is patched before we run the crypto demo to reduce the risk. In the real world, patching is a vital practice, always make sure our host systems are patched, and remember that attackers do not ask for permission to attack.
 2. Using the template in the [repo](https://github.com/udacity/nd064-c3-microservices-security-project-starter/blob/master/starter/incident_response/incident_response.txt), write an incident response report to the CTO to describe what happened. Make sure to be thoughtful and precise as we are writing to an executive. Write at least two sentences for each of the questions in Questions 2-6. Save the `incident_response_report.txt` in the `/submissions` directory of the project repo.
