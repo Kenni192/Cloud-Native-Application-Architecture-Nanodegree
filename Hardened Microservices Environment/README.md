@@ -360,8 +360,115 @@ Ensure Grype is installed and configured on our machine.
 ```
 brew tap anchore/grype
 brew install grype
+(or)
+curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
 ```
 
 ![5.grype_app_out_of_box](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Hardened%20Microservices%20Environment/submissions/5.grype_app_out_of_box.PNG)
 
 ![6.grype_app_hardened](https://github.com/Harini-Pavithra/Cloud-Native-Application-Architecture-Nanodegree/blob/main/Hardened%20Microservices%20Environment/submissions/6.grype_app_hardened.PNG)
+
+## Step 4: Implement Runtime Monitoring and Grafana
+Here we will focus on implementing Grafana to visualize run-time security alerts via Sysdig Falco.
+1. Deploy Falco drivers, Falco, and falco-exporter.
+2. Take a screenshot of the Falco and falco-exporter pods running. Save the screenshot as `kube_pods_screenshot.png` in the `/submissions` directory of the project repo.
+3. Prove that Falco is generating security events by reading the content of a sensitive file. Take a screenshot of the warning message(s) from Falco pod logs or from the falco-exporter metrics page and save it as `falco_alert_screenshot.png` in the `/submissions` directory of the project repo.
+
+Next, configure Falco to send security events to Grafana:
+1. Configure the Prometheus Operator and Grafana.
+2. Import the Falco panel for Grafana. At this point, we should have Grafana running with Falco logs flowing. If the Falco events are not showing up on Grafana, we can repeat Step 3 above to generate Falco events.
+3. Take a screenshot of the Falco Grafana panel showing the Falco security event. Save the screenshot as `falco_grafana_screenshot.png` in the `/submissions` directory of the project repo.
+
+## 4.1: Install Helm and Falco Drivers
+- We will prepare to install Falco as a DaemonSet on our RKE cluster. DaemonSets are useful for deploying ongoing background tasks, which need to run on all or certain nodes but do not require user intervention. The DaemonSet-style deployment is suitable for Falco, as Falco runs silently on all the nodes in the cluster without user intervention. Falco only needs intervention by the security engineer or administrator.
+- We will first need to install Helm, which is what we use to install and deploy Falco. If we don't have Helm installed on our machine, follow Steps 1-3 to install it.
+1. From our local machine or the virtual machine, if we are using Windows, we need to curl the following URL to download the get_helm script:
+```
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+```
+2. Change the permissions in order to execute the script we downloaded:
+```
+chmod 700 get_helm.sh
+```
+3. Run the script to install Helm:
+```
+./get_helm.sh 
+```
+4. Check Helm version via `helm version`
+```
+version.BuildInfo{Version:"v3.5.4", GitCommit:"1b5edb69df3d3a08df77c9902dc17af864ff05d1", GitTreeState:"clean", GoVersion:"go1.15.11"}
+```
+### Note: 
+We should install the latest version of Helm. Refer to this [page](https://helm.sh/docs/intro/install/) for the latest version.
+
+5. Next, we need to add the `falcosecurity` repo using a Helm chart. Helm charts are ways to package applications for Kubernetes native environments. We add the `falcosecurity` repo in order to stage it locally:
+```
+helm repo add falcosecurity https://falcosecurity.github.io/charts
+```
+We then need to install special Falco drivers and kernel headers before installing Falco itself. Falco uses either a kernel module driver (also known as kmod) or an extended Berkeley Packet Filter (eBPF) driver in order to intercept syscalls and process them from a security perspective. We need to make sure the drivers are in place so that Falco can intercept syscalls to the kernel. Here are the steps to install Falco drivers and kernel headers:
+1. SSH into `node1` and install the driver. Password is `vagrant`
+```
+ssh root@192.168.50.101
+```
+2. Execute the below command to install Falco
+```
+zypper -n install falco 
+```
+3. Execute the below commands to install necessary packages
+```
+zypper in kernel-devel
+zypper in kernel-source
+zypper in make
+zypper in gcc
+```
+4. Reboot the node and ssh into the node again.
+5. Download the `falcosecurity-3672BA8F.asc` file, which is a checksum for the drivers. Trust the falcosecurity GPG (GNU Privacy Guard) key:
+```
+rpm --import https://falco.org/repo/falcosecurity-3672BA8F.asc
+```
+6. Next, we will curl and configure the zypper repository that contains the drivers:
+```
+curl -s -o /etc/zypp/repos.d/falcosecurity.repo https://falco.org/repo/falcosecurity-rpm.repo
+```
+### Note: 
+`/etc/zypp/repos.d/falcosecurity.repo` is the name of the repo. `https://falco.org/repo/falcosecurity-rpm.repo` is the location of the repo.
+
+7. Install the kernel headers. This is a key step, where we will apply the SUSE-specific kernel headers prepared by the Falco team in order to intercept syscalls on the SUSE operating system.
+```
+zypper -n install kernel-default-devel 
+```
+### Note: 
+- The installation will take about 5 minutes. The version should be something close to 5.3.18, specifically for the x86 64-bit operating system that SUSE runs.
+- It is important to `reboot` node1 once the installation is complete. Execute the below commands to reboot the node
+```
+vagrant halt
+vagrant up
+```
+## 4.2: Install Falco as a DaemonSet on RKE and Check Falco Health
+we will install Falco as a DaemonSet with specific configurations.
+1. Ssh into the node again and add the Falco repo via
+```
+helm repo add falcosecurity https://falcosecurity.github.io/charts
+```
+2. Update the Helm repo to get the latest charts:
+```
+helm repo update
+```
+3. Install Falco using the provided Helm chart:
+```
+helm install --kubeconfig kube_config_cluster.yml falco falcosecurity/falco \
+  --set falco.grpc.enabled=true \
+  --set falco.grpcOutput.enabled=true \
+```
+### Note:
+In this command, we are setting important parameters. falco.grpc.enabled=true and falco.grpcOutput.enabled=true ensure that Falco outputs logs using the gRPC protocol. This will then allow the falco-exporter to collect those logs, stage them, and later be scrapped by Prometheus.
+
+4. Run `kubectl --kubeconfig kube_config_cluster.yml` get pod to check Falco pod health. If the pod is still being created, the status of the Falco pod will say `ContainerCreating`. After a minute or two, the Falco pod status should change to `Running`
+
+## Step 5: Incident Response
+Lastly, we will focus on introducing a suspicious command onto the Kubernetes cluster simulating a security incident. A payload is a script or file that delivers a malicious action such as running malware.
+1. From the [starter repo](https://github.com/udacity/nd064-c3-microservices-security-project-starter/tree/master/starter/scripts), run the `payload.sh` to introduce a suspicious command intentionally.
+
+The `kubectl run` commands in the payload.sh will run containers instantiated from legacy Docker images, such as [servethehome/monero_cpu_moneropool](https://hub.docker.com/r/servethehome/monero_cpu_moneropool), on our cluster. We use these as a canonical example as they are reliable and clearly illustrate falco in action in a controlled learning environment. Those Docker images will run illegitimate crypto mining software and have multiple security issues, such as not using the secure communication channels and not having a software bill of materials used in the image. We have intentionally chosen these Docker images to simulate a controlled security incident. Executing such suspicious workloads in a controlled environment poses a small security risk, particularly if our system is not patched. To be ultra cautious, make sure our host system is patched before we run the crypto demo to reduce the risk. In the real world, patching is a vital practice, always make sure our host systems are patched, and remember that attackers do not ask for permission to attack.
+
+2. Using the template in the [repo](https://github.com/udacity/nd064-c3-microservices-security-project-starter/blob/master/starter/incident_response/incident_response.txt), write an incident response report to the CTO to describe what happened. Make sure to be thoughtful and precise as we are writing to an executive. Write at least two sentences for each of the questions in Questions 2-6. Save the `incident_response_report.txt` in the `/submissions` directory of the project repo.
