@@ -465,6 +465,12 @@ In this command, we are setting important parameters. falco.grpc.enabled=true an
 
 4. Run `kubectl --kubeconfig kube_config_cluster.yml` get pod to check Falco pod health. If the pod is still being created, the status of the Falco pod will say `ContainerCreating`. After a minute or two, the Falco pod status should change to `Running`
 
+### Note:
+In case of any issues, we can analyse the logs by executing the below commands
+```
+kubectl --kubeconfig kube_config_cluster.yml logs -f falco-vwsd4
+```
+
 ## 4.3: Deploy Prometheus Operator Stack
 We will deploy the Prometheus Operator, which is a piece of software that ingests logs from Falco exporter. To recap, Falco generates security events. Falco exporter consumes and stages those in a format that Prometheus can consume. Then we configure the Prometheus Operator, which includes several different pods to ingest those logs. From there we configure Grafana to visualize and display those logs. Take the following steps to deploy the Prometheus Operator:
 1. Add the corresponding repo:
